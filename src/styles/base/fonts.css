@@ -1,0 +1,17 @@
+@font-face {
+  font-family: m;
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("../../../public/fonts/MonumentGrotesk/ABCMonumentGroteskVariable.woff2")
+      format("woff2"),
+    url("../../../public/fonts/MonumentGrotesk/ABCMonumentGroteskVariable.woff")
+      format("woff"),
+    url("../../../public/fonts/MonumentGrotesk/ABCMonumentGroteskVariable.ttf")
+      format("truetype");
+}
+
+:root {
+  --font-sans: "m", Helvetica, sans-serif;
+  --font-serif: "Times New Roman";
+}

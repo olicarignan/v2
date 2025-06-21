@@ -1,0 +1,25 @@
+html,
+body {
+  height: 100%;
+  overflow-x: hidden;
+  font-family: var(--font-sans);
+  font-weight: 400 !important;
+  color: var(--text-color);
+  background-color: var(--background-color);
+}
+
+html {
+  font-size: 62.5%;
+}
+
+body {
+  font-size: 1.6rem;
+  line-height: 1;
+  overflow-x: hidden;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+* {
+  box-sizing: border-box;
+}

@@ -1,0 +1,20 @@
+.grid {
+  --columns: 6;
+  --padding: 1.2rem;
+  --gap: 1.2rem;
+  --maxWidth: 250000px;
+
+  display: grid;
+  margin-inline: auto;
+  width: 100%;
+  gap: var(--gap);
+  grid-template-columns:
+    calc(var(--padding) - var(--gap)) repeat(var(--columns), minmax(0, 1fr))
+    calc(var(--padding) - var(--gap));
+
+  @media (min-width: 768px) {
+    --columns: 12;
+    --padding: 1.6rem;
+    --gap: 1.6rem;
+  }
+}
