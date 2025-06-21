@@ -11,6 +11,7 @@
   grid-template-columns:
     calc(var(--padding) - var(--gap)) repeat(var(--columns), minmax(0, 1fr))
     calc(var(--padding) - var(--gap));
+  row-gap: 0;
 
   @media (min-width: 768px) {
     --columns: 12;
