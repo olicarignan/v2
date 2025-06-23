@@ -11,7 +11,16 @@
       format("truetype");
 }
 
+@font-face {
+  font-family: t;
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("../../../public/fonts/TimesNow/Jha\ Times\ Now.woff2")
+    format("woff2");
+}
+
 :root {
   --font-sans: "m", Helvetica, sans-serif;
-  --font-serif: "Times New Roman";
+  --font-serif: "t", "Times New Roman", Times, serif;
 }

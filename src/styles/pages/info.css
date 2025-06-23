@@ -8,7 +8,7 @@
   .hero {
     padding: var(--hero-padding);
     font-family: var(--font-serif);
-    font-size: clamp(2.8rem, 3.17vw, 4.8rem);
+    font-size: clamp(2.8rem, 3.17vw, 3.17vw);
   }
 
   .sans {
@@ -38,6 +38,11 @@
 
         a {
           position: relative;
+
+          &:hover {
+            text-shadow: 0 0 0.5rem var(--text-color);
+            color: transparent;
+          }
 
           &::after {
             content: "↗";

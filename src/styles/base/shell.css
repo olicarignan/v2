@@ -13,7 +13,7 @@ html {
 }
 
 body {
-  font-size: 1.6rem;
+  font-size: clamp(1.6rem, 1.3vw, 2.5rem);
   line-height: 1;
   overflow-x: hidden;
   margin: 0;
@@ -22,4 +22,10 @@ body {
 
 * {
   box-sizing: border-box;
+}
+
+*::selection {
+  text-shadow: 0 0 0.5rem var(--text-color);
+  color: transparent;
+  background-color: transparent;
 }

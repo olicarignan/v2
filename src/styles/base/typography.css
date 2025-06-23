@@ -7,7 +7,7 @@ h5 {
   line-height: 1;
   font-weight: 400;
   text-transform: uppercase;
-  font-size: clamp(1.6rem, 1.5vw, 2rem);
+  font-size: clamp(1.6rem, 1.3vw, 2.5rem);
 }
 
 p {
