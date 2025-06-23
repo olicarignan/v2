@@ -12,10 +12,30 @@
     calc(var(--padding) - var(--gap)) repeat(var(--columns), minmax(0, 1fr))
     calc(var(--padding) - var(--gap));
   row-gap: 0;
+  grid-auto-rows: min-content;
 
   @media (min-width: 768px) {
     --columns: 12;
     --padding: 1.6rem;
     --gap: 1.6rem;
+  }
+
+  .subgrid {
+    display: grid;
+    grid-template-columns: repeat(var(--columns), minmax(0, 1fr));
+    gap: 0 var(--gap);
+  }
+}
+
+.app-container {
+  --padding: 1.2rem;
+
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--padding);
+  height: 100vh;
+
+  @media (min-width: 768px) {
+    --padding: 1.6rem;
   }
 }

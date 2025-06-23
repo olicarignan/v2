@@ -1,3 +1,40 @@
 .work {
   grid-column: 2 / -2;
+  height: calc(100vh - 4rem);
+  padding-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+
+  .featured {
+    height: calc((100% / 7 * 6) - 1rem - 4px);
+    display: flex;
+    align-items: end;
+
+    img {
+      height: 90%;
+      max-width: 100%;
+      object-fit: contain;
+      object-position: bottom;
+    }
+  }
+
+  .carousel {
+    display: flex;
+    gap: 0.8rem;
+    height: calc((100% / 7) - 1rem - 4px);
+    width: 100vw;
+    overflow-x: scroll;
+    transform: translateX(-1.6rem);
+    padding: 0 1.6rem;
+
+    .item {
+      height: 100%;
+
+      img {
+        height: 100%;
+        object-fit: contain;
+      }
+    }
+  }
 }
