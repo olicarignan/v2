@@ -3,7 +3,6 @@
 
   grid-column: 1 / -1;
   height: calc(var(--100dvh) - 4rem);
-  /* padding-bottom: 8px; */
   display: flex;
   flex-direction: row;
   align-items: flex-end;
@@ -13,8 +12,7 @@
   padding: 0 1.6rem 8px 1.6rem;
 
   .item {
-    /* height: calc((100% / 7) - 1rem - 4px); */
-    height: 12vh;
+    height: 12dvh;
 
     img {
       height: 100%;
@@ -23,11 +21,14 @@
   }
 
   .featured {
-    display: none;
     position: fixed;
+    bottom: calc(2.8rem + 12dvh);
+    height: 100%;
+    max-height: calc(var(--100dvh) - 8.8rem - 12dvh);
+    left: 1.6rem;
+    right: 1.6rem;
     pointer-events: none;
-    height: calc((100% / 7 * 6) - 1rem - 4px);
-    /* display: flex; */
+    display: flex;
     align-items: end;
 
     img {

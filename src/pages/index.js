@@ -1,6 +1,28 @@
+import gsap from 'gsap';
+import { useGSAP } from "@gsap/react";
+import { Observer, ScrollTrigger, ScrollToPlugin } from "gsap/all";
 
 export default function Home() {
   const carouselLength = 50;
+
+  useGSAP(() => {
+    gsap.registerPlugin(ScrollTrigger);
+
+    const wrapper = document.querySelector(".work");
+
+    function getScrollAmount() {
+      let horizontalWidth = wrapper.scrollWidth;
+      return -(horizontalWidth - window.innerWidth);
+    }
+
+    ScrollTrigger.create({
+      trigger: '.cursor',
+      start: "center center",
+      endTrigger: ".item:last-of-type",
+      end: "center center",
+      markers: true,
+    })
+  })
 
   return (
     <main className="work">
