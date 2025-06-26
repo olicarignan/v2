@@ -1,5 +1,5 @@
 .info {
-  --hero-padding: calc(5.6rem - 1.2rem) 0 5.6rem;
+  --hero-padding: 5.6rem 0;
   --h2-margin: 1.6rem;
   --contact-order: 3;
 
@@ -65,7 +65,7 @@
   }
 
   @media (min-width: 768px) {
-    --hero-padding: calc(6vw - 1.2rem) 0 6vw;
+    --hero-padding: 6vw 0;
     --h2-margin: 2rem;
     --contact-order: 0;
 

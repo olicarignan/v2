@@ -1,11 +1,13 @@
 html,
 body {
-  height: 100%;
+  /* height: 100%; */
   overflow-x: hidden;
   font-family: var(--font-sans);
   font-weight: 400 !important;
   color: var(--text-color);
   background-color: var(--background-color);
+  overscroll-behavior: none;
+  text-rendering: optimizeLegibility;
 }
 
 html {
@@ -15,7 +17,7 @@ html {
 body {
   font-size: clamp(1.6rem, 1.3vw, 2.5rem);
   line-height: 1;
-  overflow-x: hidden;
+  /* overflow-x: hidden; */
   margin: 0;
   letter-spacing: -0.02em;
 }

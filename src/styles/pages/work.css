@@ -2,17 +2,27 @@
   --100dvh: calc(var(--vh, 1dvh) * 100);
 
   grid-column: 1 / -1;
-  height: calc(var(--100dvh) - 4rem);
-  display: flex;
-  flex-direction: row;
-  align-items: flex-end;
-  gap: 0.8rem;
   position: relative;
-  overflow-x: scroll;
-  padding: 0 1.6rem 8px 1.6rem;
+  /* height: 100vh; */
+  /* overflow-x: scroll; */
+
+  .work__container {
+    position: relative;
+    /* height: calc(var(--100dvh) - 4rem); */
+    height: 100vh;
+    width: max-content;
+    padding: 0px 160px;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 0.8rem;
+    padding: 0 1.6rem 8px 1.6rem;
+  }
 
   .item {
     height: 12dvh;
+    position: relative;
+    display: flex;
 
     img {
       height: 100%;
@@ -59,4 +69,11 @@
     transform: translateX(-1.6rem);
     padding: 0 1.6rem;
   }
+}
+
+.scroll-container {
+  position: fixed;
+  left: 0;
+  right: 0;
+  will-change: transform;
 }
