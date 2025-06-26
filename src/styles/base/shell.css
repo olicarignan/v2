@@ -8,6 +8,11 @@ body {
   background-color: var(--background-color);
   overscroll-behavior: none;
   text-rendering: optimizeLegibility;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 html {
@@ -17,7 +22,6 @@ html {
 body {
   font-size: clamp(1.6rem, 1.3vw, 2.5rem);
   line-height: 1;
-  /* overflow-x: hidden; */
   margin: 0;
   letter-spacing: -0.02em;
 }

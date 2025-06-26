@@ -8,7 +8,6 @@ import {
   useTransform,
   useSpring,
   useMotionValueEvent,
-  useMotionValue,
 } from "motion/react";
 
 import { useRef, useState, useLayoutEffect, useCallback } from "react";
@@ -56,25 +55,23 @@ export default function Home() {
     [0, 1],
     [0, -scrollRange + viewportW]
   );
-  const physics = { damping: 15, mass: 0.27, stiffness: 55 };
-  const spring = useSpring(transform, physics);
 
   return (
     <main className="work">
       <div className="scroll-container">
         <motion.div
           ref={scrollRef}
-          style={{ x: spring }}
+          style={{ x: transform.current }}
           className="work__container"
         >
-          <div className="featured">
+          <motion.div className="featured" style={{ left: -transform.current + 16 }}>
             {/* <h1>{scrollYProgress.current}</h1> */}
             <img
               src="https://random-image-pepebigotes.vercel.app/api/random-image"
               alt=""
             />
-          </div>
-          <div className="cursor" />
+          </motion.div>
+          <motion.div className="cursor" style={{ x: -transform.current }} />
           {/* <div className="carousel">
           </div> */}
           {Array.from({ length: carouselLength }).map((item, index) => {
