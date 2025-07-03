@@ -1,7 +1,3 @@
-import gsap from 'gsap';
-import { useGSAP } from "@gsap/react";
-import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
-
 import {
   motion,
   useScroll,
@@ -18,25 +14,31 @@ export default function Home({home}) {
 
   const scrollRef = useRef(null);
   const ghostRef = useRef(null);
+  const itemRefs = useRef([]);
 
   const [scrollRange, setScrollRange] = useState(0);
   const [viewportW, setViewportW] = useState(0);
   const [yProgress, setYProgress] = useState(0);
   const [activeAsset, setActiveAsset] = useState(home.assets[0]);
+  const [lastItemWidth, setLastItemWidth] = useState(0);
+  const [paddingRight, setPaddingRight] = useState(0);
 
-  useGSAP(() => {
-    gsap.registerPlugin(ScrollTrigger);
-  }, []);
+  useLayoutEffect(() => {
+    setLastItemWidth(itemRefs.current[itemRefs.current.length - 1].offsetWidth);
+  }, [itemRefs]);
 
   useLayoutEffect(() => {
     scrollRef.current && setScrollRange(scrollRef.current.scrollWidth);
-  }, [scrollRef]);
+  }, [scrollRef, paddingRight]);
 
   const onResize = useCallback((entries) => {
+
     for (let entry of entries) {
+      // console.log(entry.contentRect);
       setViewportW(entry.contentRect.width);
+      setPaddingRight(entry.contentRect.width - lastItemWidth);
     }
-  }, []);
+  }, [lastItemWidth]);
 
   useLayoutEffect(() => {
     const resizeObserver = new ResizeObserver((entries) => onResize(entries));
@@ -61,7 +63,7 @@ export default function Home({home}) {
       <div className="scroll-container">
         <motion.div
           ref={scrollRef}
-          style={{ x: transform.current }}
+          style={{ x: transform.current, paddingRight: paddingRight - 16 }}
           className="work__container"
         >
           <motion.div className="featured" style={{ left: -transform.current + 16 }}>
@@ -71,19 +73,20 @@ export default function Home({home}) {
             />
           </motion.div>
           <motion.div className="cursor" style={{ x: -transform.current }} />
-          {home.assets.map((asset) => {
+          {home.assets.map((asset, index) => {
             return (
-              <div className="item" key={asset.id}>
-                <img
-                  src={asset.url}
-                  alt={asset.alt}
-                />
+              <div
+                className="item"
+                key={asset.id}
+                ref={(el) => (itemRefs.current[index] = el)}
+              >
+                <img src={asset.url} alt={asset.alt} />
               </div>
             );
           })}
         </motion.div>
       </div>
-      <div ref={ghostRef} style={{ height: scrollRange }} className="ghost" />
+      <div ref={ghostRef} style={{ height: scrollRange + paddingRight - 16}} className="ghost" />
     </main>
   );
 }
