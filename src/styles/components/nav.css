@@ -24,6 +24,15 @@
     flex: 1;
   }
 
+  .logo {
+    width: fit-content;
+
+    &:hover {
+      text-shadow: 0 0 0.5rem var(--text-color);
+      color: transparent;
+    }
+  }
+
   .monogram {
     width: clamp(var(--min-font-size), 1.5vw, var(--max-font-size));
     height: clamp(var(--min-font-size), 1.5vw, var(--max-font-size));
@@ -36,6 +45,7 @@
 
   .wordmark {
     display: none;
+    width: fit-content;
   }
 
   .menu {

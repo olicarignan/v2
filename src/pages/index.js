@@ -49,7 +49,7 @@ export default function Home({home}) {
   const { scrollYProgress } = useScroll();
 
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
-    setYProgress(latest)
+    requestAnimationFrame(() => setYProgress(latest))
   });
 
   const transform = useTransform(
@@ -64,6 +64,7 @@ export default function Home({home}) {
         <motion.div
           ref={scrollRef}
           style={{ x: transform.current, paddingRight: paddingRight - 16 }}
+          transition={{ duration: 0 }}
           className="work__container"
         >
           <motion.div className="featured" style={{ left: -transform.current + 16 }}>

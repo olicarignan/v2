@@ -24,11 +24,13 @@ export default function Nav() {
 
   return (
     <nav className="nav">
-      <div className="logo">
-        <div className="monogram">
-          <Monogram />
-        </div>
-        <span className="wordmark">Olivier Carignan</span>
+      <div>
+        <Link className="logo" href="/">
+          <div className="monogram">
+            <Monogram />
+          </div>
+          <span className="wordmark">Olivier Carignan</span>
+        </Link>
       </div>
       <div className="menu">
         <Link className={"menu__item item--first " + isActive("/")} href="/">
