@@ -22,7 +22,7 @@ export default function Home({home}) {
   const [scrollRange, setScrollRange] = useState(0);
   const [viewportW, setViewportW] = useState(0);
   const [yProgress, setYProgress] = useState(0);
-  const [active, setActive] = useState(false);
+  const [activeAsset, setActiveAsset] = useState(home.assets[0]);
 
   useGSAP(() => {
     gsap.registerPlugin(ScrollTrigger);
@@ -65,10 +65,9 @@ export default function Home({home}) {
           className="work__container"
         >
           <motion.div className="featured" style={{ left: -transform.current + 16 }}>
-            {/* <h1>{scrollYProgress.current}</h1> */}
             <img
-              src="https://random-image-pepebigotes.vercel.app/api/random-image"
-              alt=""
+              src={activeAsset.url}
+              alt={activeAsset.alt}
             />
           </motion.div>
           <motion.div className="cursor" style={{ x: -transform.current }} />
