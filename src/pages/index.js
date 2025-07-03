@@ -6,16 +6,15 @@ import {
   motion,
   useScroll,
   useTransform,
-  useSpring,
   useMotionValueEvent,
 } from "motion/react";
-
 import { useRef, useState, useLayoutEffect, useCallback } from "react";
-
 import ResizeObserver from "resize-observer-polyfill";
 
-export default function Home() {
-  const carouselLength = 50;
+import { getPropData } from '@/utils/propData';
+import { getHome } from '@/utils/queries';
+
+export default function Home({home}) {
 
   const scrollRef = useRef(null);
   const ghostRef = useRef(null);
@@ -23,6 +22,7 @@ export default function Home() {
   const [scrollRange, setScrollRange] = useState(0);
   const [viewportW, setViewportW] = useState(0);
   const [yProgress, setYProgress] = useState(0);
+  const [active, setActive] = useState(false);
 
   useGSAP(() => {
     gsap.registerPlugin(ScrollTrigger);
@@ -72,14 +72,12 @@ export default function Home() {
             />
           </motion.div>
           <motion.div className="cursor" style={{ x: -transform.current }} />
-          {/* <div className="carousel">
-          </div> */}
-          {Array.from({ length: carouselLength }).map((item, index) => {
+          {home.assets.map((asset) => {
             return (
-              <div className="item" key={index}>
+              <div className="item" key={asset.id}>
                 <img
-                  src="https://random-image-pepebigotes.vercel.app/api/random-image"
-                  alt=""
+                  src={asset.url}
+                  alt={asset.alt}
                 />
               </div>
             );
@@ -89,4 +87,17 @@ export default function Home() {
       <div ref={ghostRef} style={{ height: scrollRange }} className="ghost" />
     </main>
   );
+}
+
+export const getStaticProps = async () => {
+
+
+  const home = await getPropData(getHome);
+
+  return {
+    props: {
+      ...home
+    },
+  };
+
 }

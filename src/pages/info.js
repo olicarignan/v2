@@ -1,4 +1,9 @@
-export default function Info() {
+import { getPropData } from "@/utils/propData";
+import { getInfo } from "@/utils/queries";
+
+export default function Info({info}) {
+  const { clients, services } = info;
+
   return (
     <main className="info">
       <div className="hero">
@@ -44,29 +49,35 @@ export default function Info() {
         <article className="services">
           <h2>Services</h2>
           <ul>
-            <li>Digital Design</li>
-            <li>Art Direction</li>
-            <li>Branding & Identity</li>
-            <li>Interaction Design</li>
-            <li>Research & Strategy</li>
-            <li>Product Design</li>
-            <li>Experimental Development</li>
+            {services.map((service) => {
+              return (
+                <li key={service.id}>{service.listItem}</li>
+              );
+            })}
           </ul>
         </article>
 
         <article className="clients">
           <h2>Clients</h2>
           <ul>
-            <li>Apple</li>
-            <li>WØRKS</li>
-            <li>RTINGS.com</li>
-            <li>Evenko</li>
-            <li>POP Montreal</li>
-            <li>ARC Health</li>
-            <li>Rounder</li>
+            {clients.map((client) => {
+              return (
+                <li key={client.id}>{client.listItem}</li>
+              );
+            })}
           </ul>
         </article>
       </div>
     </main>
   );
 }
+
+export const getStaticProps = async () => {
+  const info = await getPropData(getInfo);
+
+  return {
+    props: {
+      ...info,
+    },
+  };
+};
