@@ -4,11 +4,9 @@
   --menu-gap: 1.2rem;
   --padding: 1.2rem;
 
-  /* grid-column: 2 / -2; */
   padding: 1.2rem var(--padding);
   display: flex;
   align-items: baseline;
-  /* font-size: clamp(var(--min-font-size), 1.5vw, var(--max-font-size)); */
   font-size: 1.4rem;
   line-height: 1;
   text-transform: uppercase;
@@ -25,7 +23,7 @@
   }
 
   .logo {
-    width: fit-content;
+    display: inline-block;
 
     &:hover {
       text-shadow: 0 0 0.5rem var(--text-color);
