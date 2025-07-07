@@ -50,7 +50,7 @@
   .cursor {
     position: fixed;
     bottom: 8px;
-    left: 17px;
+    left: 3.2rem;
     height: 12vh;
     width: 1px;
     z-index: 999;

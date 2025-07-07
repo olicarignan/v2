@@ -21,7 +21,11 @@ export default function App({ Component, pageProps }) {
 
   return (
     <div className="grid">
-      <ReactLenis overscroll={false} root ref={lenisRef} />
+      <ReactLenis
+        overscroll={false}
+        root
+        ref={lenisRef}
+      />
       <Nav />
       <Component {...pageProps} />
     </div>

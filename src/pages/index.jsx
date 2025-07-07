@@ -2,8 +2,6 @@
 
 import {
   motion,
-  frame,
-  cancelFrame,
   useScroll,
   useTransform,
   useMotionValueEvent,
@@ -37,7 +35,6 @@ export default function Home({home}) {
     },
     [viewportW]
   );
-
 
   useLayoutEffect(() => {
     setLastItemWidth(itemRefs.current[itemRefs.current.length - 1].offsetWidth);
@@ -104,8 +101,8 @@ export default function Home({home}) {
     [0, -scrollRange + viewportW]
   );
 
-  console.log(lenis?.animatedScroll)
-  console.log(transform.current)
+  console.log(yProgress)
+  console.log(progress)
 
   return (
     <main className="work">
@@ -151,7 +148,6 @@ export default function Home({home}) {
 }
 
 export const getStaticProps = async () => {
-
 
   const home = await getPropData(getHome);
 
