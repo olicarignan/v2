@@ -8,6 +8,8 @@ export const getHome = gql`
         alt
         url
         blurUpThumb
+        height
+        width
         focalPoint {
           x
           y

@@ -6,13 +6,16 @@ import ResizeObserver from "resize-observer-polyfill";
 
 import { elementsOverlap } from '@/utils/elementsOverlap';
 
+import { vh } from '@/utils/vh';
 import { getPropData } from '@/utils/propData';
 import { getHome } from '@/utils/queries';
 
-export default function Home({home, thumbnailHeight = 75, gap = 8}) {
+export default function Home({home, thumbnailHeightVh = 12}) {
   const [scrollOffset, setScrollOffset] = useState(0);
   const [activeThumbnail, setActiveThumbnail] = useState(0);
   const [imageLoadStates, setImageLoadStates] = useState({});
+  const [viewportHeight, setViewportHeight] = useState(0);
+  const [viewportWidth, setViewportWidth] = useState(0);
   const thumbnailRefs = useRef([]);
   const cursorRef = useRef(null);
   const observerRef = useRef(null);
@@ -24,6 +27,85 @@ export default function Home({home, thumbnailHeight = 75, gap = 8}) {
 
   // Track if we're in keyboard navigation mode to prevent interference
   const [isKeyboardNavigating, setIsKeyboardNavigating] = useState(false);
+
+  // Calculate thumbnail height based on viewport height
+  const thumbnailHeight = useMemo(() => {
+    if (viewportHeight === 0) return 75; // Fallback while measuring
+    return Math.floor((viewportHeight * thumbnailHeightVh) / 100);
+  }, [viewportHeight, thumbnailHeightVh]);
+
+  // Calculate dynamic gap: clamped between 8px and 0.5vw
+  const dynamicGap = useMemo(() => {
+    if (viewportWidth === 0) return 8; // Fallback while measuring
+    const halfVw = (viewportWidth * 0.5) / 100; // 0.5vw in pixels
+    return Math.max(8, halfVw); // Clamp minimum to 8px
+  }, [viewportWidth]);
+
+  // Update viewport height and width on mount and resize
+  useEffect(() => {
+    const updateViewportDimensions = () => {
+      // Use visualViewport if available (better for mobile with dynamic viewport)
+      if (window.visualViewport) {
+        setViewportHeight(window.visualViewport.height);
+        setViewportWidth(window.visualViewport.width);
+      } else {
+        // Fallback to window.innerHeight/innerWidth
+        setViewportHeight(window.innerHeight);
+        setViewportWidth(window.innerWidth);
+      }
+    };
+
+    // Initial measurement
+    updateViewportDimensions();
+
+    // Listen for resize events
+    const handleResize = () => {
+      updateViewportDimensions();
+    };
+
+    // Listen for visual viewport changes (mobile address bar, etc.)
+    const handleVisualViewportChange = () => {
+      if (window.visualViewport) {
+        setViewportHeight(window.visualViewport.height);
+        setViewportWidth(window.visualViewport.width);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener(
+        "resize",
+        handleVisualViewportChange
+      );
+    }
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener(
+          "resize",
+          handleVisualViewportChange
+        );
+      }
+    };
+  }, []);
+
+  // Default projects if none provided
+  const defaultProjects = useMemo(
+    () =>
+      Array.from({ length: 11 }, (_, i) => ({
+        id: i + 1,
+        title: `Project ${i + 1}`,
+        color: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
+        // Simulate different aspect ratios for demo
+        imageUrl: `/placeholder.svg?height=${thumbnailHeight}&width=${
+          Math.floor(Math.random() * 60) + 60
+        }`,
+        aspectRatio: (Math.floor(Math.random() * 60) + 60) / thumbnailHeight,
+      })),
+    [thumbnailHeight]
+  );
 
   const projectList = home.assets;
 
@@ -128,7 +210,10 @@ export default function Home({home, thumbnailHeight = 75, gap = 8}) {
       }
     };
 
-    loadImageDimensions();
+    // Only load images if we have a valid thumbnail height
+    if (thumbnailHeight > 0) {
+      loadImageDimensions();
+    }
   }, [projectList, thumbnailHeight]);
 
   // Calculate cumulative positions for each thumbnail
@@ -137,11 +222,13 @@ export default function Home({home, thumbnailHeight = 75, gap = 8}) {
       if (index === 0) {
         acc.push(0);
       } else {
-        acc.push(acc[index - 1] + generatedThumbnailWidths[index - 1] + gap);
+        acc.push(
+          acc[index - 1] + generatedThumbnailWidths[index - 1] + dynamicGap
+        );
       }
       return acc;
     }, []);
-  }, [generatedThumbnailWidths, gap]);
+  }, [generatedThumbnailWidths, dynamicGap]);
 
   // Calculate total width of all thumbnails
   const totalWidth = useMemo(() => {
@@ -413,6 +500,7 @@ export default function Home({home, thumbnailHeight = 75, gap = 8}) {
     setScrollOffset(clampedOffset);
     setActiveThumbnail(index);
   };
+
 
   // // Cursor interaction
   // useLayoutEffect(() => {
