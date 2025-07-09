@@ -6,9 +6,10 @@ import ResizeObserver from "resize-observer-polyfill";
 
 import { elementsOverlap } from '@/utils/elementsOverlap';
 
-import { vh } from '@/utils/vh';
 import { getPropData } from '@/utils/propData';
 import { getHome } from '@/utils/queries';
+import { rafThrottle } from '@/utils/rafThrottle';
+import { throttle } from '@/utils/throttle';
 
 export default function Home({home, thumbnailHeightVh = 12}) {
   const [scrollOffset, setScrollOffset] = useState(0);
@@ -18,15 +19,18 @@ export default function Home({home, thumbnailHeightVh = 12}) {
   const [viewportWidth, setViewportWidth] = useState(0);
   const thumbnailRefs = useRef([]);
   const cursorRef = useRef(null);
-  const observerRef = useRef(null);
 
   // Touch handling state
   const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, offset: 0 });
+  const [dragStart, setDragStart] = useState({ x: 0, offset: 0, time: 0 });
   const [momentum, setMomentum] = useState(0);
+  const [lastTouchMove, setLastTouchMove] = useState({ x: 0, time: 0 });
 
   // Track if we're in keyboard navigation mode to prevent interference
   const [isKeyboardNavigating, setIsKeyboardNavigating] = useState(false);
+
+  // Add this after the existing state declarations
+  const [isSnapping, setIsSnapping] = useState(false);
 
   // Calculate thumbnail height based on viewport height
   const thumbnailHeight = useMemo(() => {
@@ -90,22 +94,6 @@ export default function Home({home, thumbnailHeightVh = 12}) {
       }
     };
   }, []);
-
-  // Default projects if none provided
-  const defaultProjects = useMemo(
-    () =>
-      Array.from({ length: 11 }, (_, i) => ({
-        id: i + 1,
-        title: `Project ${i + 1}`,
-        color: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
-        // Simulate different aspect ratios for demo
-        imageUrl: `/placeholder.svg?height=${thumbnailHeight}&width=${
-          Math.floor(Math.random() * 60) + 60
-        }`,
-        aspectRatio: (Math.floor(Math.random() * 60) + 60) / thumbnailHeight,
-      })),
-    [thumbnailHeight]
-  );
 
   const projectList = home.assets;
 
@@ -278,53 +266,89 @@ export default function Home({home, thumbnailHeightVh = 12}) {
     }
   }, [projectList.length, activeThumbnail]);
 
-  // Set up IntersectionObserver for the cursor
+  // Remove the IntersectionObserver effect and replace with collision detection
   useEffect(() => {
     if (!cursorRef.current || projectList.length === 0) return;
 
-    const options = {
-      root: null,
-      rootMargin: "0px",
-      threshold: 0.1,
-    };
-
-    observerRef.current = new IntersectionObserver((entries) => {
-      // Don't update active thumbnail if we're in keyboard navigation mode
+    const checkCollisions = () => {
       if (isKeyboardNavigating) return;
 
-      let maxIntersection = 0;
       let activeIndex = 0;
+      let closestDistance = Number.POSITIVE_INFINITY;
 
-      entries.forEach((entry) => {
-        if (entry.isIntersecting && entry.intersectionRatio > maxIntersection) {
-          maxIntersection = entry.intersectionRatio;
-          activeIndex = Number.parseInt(entry.target.dataset.index);
+      thumbnailRefs.current.forEach((thumbnail, index) => {
+        if (!thumbnail) return;
+
+        const thumbnailRect = thumbnail.getBoundingClientRect();
+
+        // Calculate distance from thumbnail's left edge to 16px from viewport left
+        const targetPosition = 16; // 16px from left side of viewport
+        const distance = Math.abs(thumbnailRect.left - targetPosition);
+
+        // Find the thumbnail whose left edge is closest to exactly 16px from viewport left
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          activeIndex = index;
         }
       });
 
-      if (maxIntersection > 0 && activeIndex < projectList.length) {
+      // Only set active if we found a valid thumbnail
+      if (activeIndex < projectList.length) {
         setActiveThumbnail(activeIndex);
       }
-    }, options);
+    };
 
-    // Initial observation of all thumbnails
-    thumbnailRefs.current.forEach((thumbnail) => {
-      if (thumbnail) {
-        observerRef.current.observe(thumbnail);
-      }
-    });
+    // Check collisions on scroll offset changes
+    checkCollisions();
+  }, [scrollOffset, isKeyboardNavigating, projectList.length]);
 
-    return () => {
-      if (observerRef.current) {
-        observerRef.current.disconnect();
+  // Also check collisions on window resize
+  useEffect(() => {
+    if (projectList.length === 0) return;
+
+    const handleResize = () => {
+      if (!isKeyboardNavigating) {
+        const checkCollisions = () => {
+          if (!cursorRef.current) return;
+
+          let activeIndex = 0;
+          let closestDistance = Number.POSITIVE_INFINITY;
+
+          thumbnailRefs.current.forEach((thumbnail, index) => {
+            if (!thumbnail) return;
+
+            const thumbnailRect = thumbnail.getBoundingClientRect();
+
+            // Calculate distance from thumbnail's left edge to 16px from viewport left
+            const targetPosition = 16; // 16px from left side of viewport
+            const distance = Math.abs(thumbnailRect.left - targetPosition);
+
+            // Find the thumbnail whose left edge is closest to exactly 16px from viewport left
+            if (distance < closestDistance) {
+              closestDistance = distance;
+              activeIndex = index;
+            }
+          });
+
+          // Only set active if we found a valid thumbnail
+          if (activeIndex < projectList.length) {
+            setActiveThumbnail(activeIndex);
+          }
+        };
+
+        // Use RAF to avoid excessive calculations during resize
+        requestAnimationFrame(checkCollisions);
       }
     };
-  }, [projectList.length, isKeyboardNavigating]);
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [isKeyboardNavigating, projectList.length]);
 
   useEffect(() => {
     if (projectList.length === 0) return;
 
-    const handleWheel = (e) => {
+    const handleWheel = rafThrottle((e) => {
       e.preventDefault();
 
       // Reset keyboard navigation mode
@@ -335,12 +359,19 @@ export default function Home({home, thumbnailHeightVh = 12}) {
       setScrollOffset((prev) => {
         const newOffset = prev - scrollDelta * 0.5;
         const clampedOffset = clampOffset(newOffset);
-
-        const calculatedActive = calculateActiveThumbnail(clampedOffset);
-        setActiveThumbnail(calculatedActive);
-
         return clampedOffset;
       });
+    });
+
+    // Separate throttled function for active thumbnail calculation
+    const updateActiveThumbnail = throttle((offset) => {
+      const calculatedActive = calculateActiveThumbnail(offset);
+      setActiveThumbnail(calculatedActive);
+    }, 16); // ~60fps
+
+    // Listen for scroll offset changes to update active thumbnail
+    const unsubscribe = () => {
+      updateActiveThumbnail(scrollOffset);
     };
 
     window.addEventListener("wheel", handleWheel, { passive: false });
@@ -350,12 +381,23 @@ export default function Home({home, thumbnailHeightVh = 12}) {
     };
   }, [projectList.length, thumbnailPositions, minOffset, maxOffset]);
 
-  // Touch event handlers
+  // Separate effect to update active thumbnail when scroll offset changes
+  useEffect(() => {
+    const updateActiveThumbnail = throttle((offset) => {
+      if (!isKeyboardNavigating) {
+        const calculatedActive = calculateActiveThumbnail(offset);
+        setActiveThumbnail(calculatedActive);
+      }
+    }, 16);
+
+    updateActiveThumbnail(scrollOffset);
+  }, [scrollOffset, isKeyboardNavigating, thumbnailPositions]);
+
+  // Touch event handlers - simplified and working version
   useEffect(() => {
     if (projectList.length === 0) return;
 
     const handleTouchStart = (e) => {
-      // Reset keyboard navigation mode
       setIsKeyboardNavigating(false);
 
       const touch = e.touches[0];
@@ -363,12 +405,21 @@ export default function Home({home, thumbnailHeightVh = 12}) {
       setDragStart({
         x: touch.clientX,
         offset: scrollOffset,
+        time: Date.now(),
       });
       setMomentum(0);
+
+      // Store initial touch position for velocity calculation
+      setLastTouchMove({
+        x: touch.clientX,
+        time: Date.now(),
+      });
     };
 
     const handleTouchMove = (e) => {
       if (!isDragging) return;
+
+      // Prevent default to avoid page scrolling
       e.preventDefault();
 
       const touch = e.touches[0];
@@ -378,21 +429,33 @@ export default function Home({home, thumbnailHeightVh = 12}) {
 
       setScrollOffset(clampedOffset);
 
-      const calculatedActive = calculateActiveThumbnail(clampedOffset);
-      setActiveThumbnail(calculatedActive);
+      // Update last touch position for velocity calculation
+      setLastTouchMove({
+        x: touch.clientX,
+        time: Date.now(),
+      });
     };
 
     const handleTouchEnd = (e) => {
       if (!isDragging) return;
       setIsDragging(false);
 
+      // Calculate velocity for momentum
+      const endTime = Date.now();
+      const timeDiff = endTime - lastTouchMove.time;
       const touch = e.changedTouches[0];
-      const finalDelta = touch.clientX - dragStart.x;
-      const momentumValue = finalDelta * 0.1;
+      const distanceDiff = touch.clientX - lastTouchMove.x;
 
-      setMomentum(momentumValue);
+      if (timeDiff > 0 && timeDiff < 100) {
+        // Only use recent movement
+        const velocity = (distanceDiff / timeDiff) * 16; // Scale for smooth momentum
+        if (Math.abs(velocity) > 1) {
+          setMomentum(velocity);
+        }
+      }
     };
 
+    // Add event listeners to document for better touch handling
     document.addEventListener("touchstart", handleTouchStart, {
       passive: false,
     });
@@ -404,38 +467,98 @@ export default function Home({home, thumbnailHeightVh = 12}) {
       document.removeEventListener("touchmove", handleTouchMove);
       document.removeEventListener("touchend", handleTouchEnd);
     };
-  }, [isDragging, dragStart, scrollOffset, projectList.length]);
+  }, [isDragging, dragStart, scrollOffset, lastTouchMove, projectList.length]);
 
-  // Apply momentum after touch ends
+  // Enhanced momentum handling with snap-to-position
   useEffect(() => {
     if (momentum === 0 || projectList.length === 0) return;
 
+    let animationId;
+
     const applyMomentum = () => {
-      setMomentum((prev) => {
-        const newMomentum = prev * 0.95;
+      setMomentum((prevMomentum) => {
+        const newMomentum = prevMomentum * 0.95; // Decay factor
 
         if (Math.abs(newMomentum) < 0.1) {
-          return 0;
+          return 0; // Stop momentum when it's too small
         }
 
         setScrollOffset((currentOffset) => {
           const newOffset = currentOffset + newMomentum;
-          const clampedOffset = clampOffset(newOffset);
-
-          const calculatedActive = calculateActiveThumbnail(clampedOffset);
-          setActiveThumbnail(calculatedActive);
-
-          return clampedOffset;
+          return clampOffset(newOffset);
         });
 
+        // Continue animation
+        animationId = requestAnimationFrame(applyMomentum);
         return newMomentum;
       });
     };
 
-    const intervalId = setInterval(applyMomentum, 16);
+    animationId = requestAnimationFrame(applyMomentum);
 
-    return () => clearInterval(intervalId);
+    return () => {
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+      }
+    };
   }, [momentum, projectList.length]);
+
+  // Add snap-to-position effect that triggers when momentum stops
+  useEffect(() => {
+    if (momentum !== 0 || isDragging || isKeyboardNavigating) return;
+
+    const snapTimeout = setTimeout(() => {
+      const activeThumb = thumbnailRefs.current[activeThumbnail];
+      if (!activeThumb) return;
+
+      const thumbRect = activeThumb.getBoundingClientRect();
+      const targetPosition = 16; // 16px from left edge
+      const currentPosition = thumbRect.left;
+      const snapDistance = targetPosition - currentPosition;
+
+      // Only snap if we're more than 2px away from target
+      if (Math.abs(snapDistance) > 2) {
+        setIsSnapping(true);
+
+        // Calculate the required scroll offset adjustment
+        const requiredOffset = scrollOffset + snapDistance;
+        const clampedOffset = clampOffset(requiredOffset);
+
+        // Animate to the snap position
+        const startOffset = scrollOffset;
+        const startTime = performance.now();
+        const duration = 300; // 300ms snap animation
+
+        const animateSnap = (currentTime) => {
+          const elapsed = currentTime - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+
+          // Easing function for smooth animation
+          const easeOut = 1 - Math.pow(1 - progress, 3);
+
+          const currentSnapOffset =
+            startOffset + (clampedOffset - startOffset) * easeOut;
+          setScrollOffset(currentSnapOffset);
+
+          if (progress < 1) {
+            requestAnimationFrame(animateSnap);
+          } else {
+            setIsSnapping(false);
+          }
+        };
+
+        requestAnimationFrame(animateSnap);
+      }
+    }, 200); // Wait 200ms after momentum stops
+
+    return () => clearTimeout(snapTimeout);
+  }, [
+    momentum,
+    isDragging,
+    isKeyboardNavigating,
+    activeThumbnail,
+    scrollOffset,
+  ]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -501,25 +624,11 @@ export default function Home({home, thumbnailHeightVh = 12}) {
     setActiveThumbnail(index);
   };
 
-
-  // // Cursor interaction
-  // useLayoutEffect(() => {
-  //   const cursor = cursorRef.current.getBoundingClientRect();
-  //   const items = itemRefs.current;
-  //   for (let i = 0; i < items.length; i++) {
-  //     const item = items[i].getBoundingClientRect();
-  //     if (elementsOverlap(item, cursor)) {
-  //       requestAnimationFrame(() => setActiveIndex(i));
-  //     }
-  //   }
-  // }, [cursorRef, yProgress]);
-
   return (
     <main className="work">
       <div className="scroll-container">
         <div
-          // ref={scrollRef}
-          style={{ transform: `translateX(${scrollOffset}px)` }}
+          style={{ transform: `translateX(${scrollOffset}px)`, gap: dynamicGap }}
           className="work__container"
         >
           <div
@@ -531,7 +640,7 @@ export default function Home({home, thumbnailHeightVh = 12}) {
               alt={home.assets[activeThumbnail].alt}
             />
           </div>
-          <div className="cursor" ref={cursorRef} />
+          <div className="cursor" ref={cursorRef} style={{ transform: `translateX(${-scrollOffset}px)` }} />
           {home.assets.map((asset, index) => {
             return (
               <div
