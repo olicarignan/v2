@@ -1,36 +1,44 @@
-'use client'
+"use client";
 
-import { useRef, useState, useEffect, useLayoutEffect, useCallback, useMemo
- } from "react";
-import ResizeObserver from "resize-observer-polyfill";
+import { useRef, useState, useEffect, useMemo } from "react";
 
-import { elementsOverlap } from '@/utils/elementsOverlap';
+import Preloader from "@/components/Preloader";
 
-import { getPropData } from '@/utils/propData';
-import { getHome } from '@/utils/queries';
-import { rafThrottle } from '@/utils/rafThrottle';
-import { throttle } from '@/utils/throttle';
+import { useViewport } from "@/hooks/useViewport";
+import { useInternalLoading } from "@/hooks/useInternalLoading";
+import { useMomentum } from "@/hooks/useMomentum";
+import { useSnapToPosition } from "@/hooks/useSnapToPosition";
+import { useTouchHandling } from "@/hooks/useTouchHandling";
+import { useImageLoader } from "@/hooks/useImageLoader";
 
-export default function Home({home, thumbnailHeightVh = 12}) {
+import { getPropData } from "@/utils/propData";
+import { getHome } from "@/gql/queries";
+import {
+  throttle,
+  rafThrottle,
+  calculateImageWidth,
+  calculateThumbnailPositions,
+  calculateTotalWidth,
+  clampOffset,
+  calculateActiveThumbnail,
+} from "@/utils/helpers";
+
+export default function Home({ home, thumbnailHeightVh = 12, projects=[], isLoading=false, loadingProgress=0, loadingText="Loading Portfolio", onLoadComplete }) {
   const [scrollOffset, setScrollOffset] = useState(0);
   const [activeThumbnail, setActiveThumbnail] = useState(0);
-  const [imageLoadStates, setImageLoadStates] = useState({});
-  const [viewportHeight, setViewportHeight] = useState(0);
-  const [viewportWidth, setViewportWidth] = useState(0);
   const thumbnailRefs = useRef([]);
   const cursorRef = useRef(null);
-
-  // Touch handling state
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, offset: 0, time: 0 });
-  const [momentum, setMomentum] = useState(0);
-  const [lastTouchMove, setLastTouchMove] = useState({ x: 0, time: 0 });
 
   // Track if we're in keyboard navigation mode to prevent interference
   const [isKeyboardNavigating, setIsKeyboardNavigating] = useState(false);
 
-  // Add this after the existing state declarations
-  const [isSnapping, setIsSnapping] = useState(false);
+  // Custom hooks
+  const { viewportHeight, viewportWidth } = useViewport();
+  const { internalLoading, internalProgress } = useInternalLoading(
+    projects,
+    isLoading,
+    onLoadComplete
+  );
 
   // Calculate thumbnail height based on viewport height
   const thumbnailHeight = useMemo(() => {
@@ -45,228 +53,91 @@ export default function Home({home, thumbnailHeightVh = 12}) {
     return Math.max(8, halfVw); // Clamp minimum to 8px
   }, [viewportWidth]);
 
-  // Update viewport height and width on mount and resize
-  useEffect(() => {
-    const updateViewportDimensions = () => {
-      // Use visualViewport if available (better for mobile with dynamic viewport)
-      if (window.visualViewport) {
-        setViewportHeight(window.visualViewport.height);
-        setViewportWidth(window.visualViewport.width);
-      } else {
-        // Fallback to window.innerHeight/innerWidth
-        setViewportHeight(window.innerHeight);
-        setViewportWidth(window.innerWidth);
-      }
-    };
-
-    // Initial measurement
-    updateViewportDimensions();
-
-    // Listen for resize events
-    const handleResize = () => {
-      updateViewportDimensions();
-    };
-
-    // Listen for visual viewport changes (mobile address bar, etc.)
-    const handleVisualViewportChange = () => {
-      if (window.visualViewport) {
-        setViewportHeight(window.visualViewport.height);
-        setViewportWidth(window.visualViewport.width);
-      }
-    };
-
-    window.addEventListener("resize", handleResize);
-
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener(
-        "resize",
-        handleVisualViewportChange
-      );
-    }
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-      if (window.visualViewport) {
-        window.visualViewport.removeEventListener(
-          "resize",
-          handleVisualViewportChange
-        );
-      }
-    };
-  }, []);
-
   const projectList = home.assets;
 
-  // Function to calculate width from image dimensions or aspect ratio
-  const calculateImageWidth = (project, index) => {
-    // Method 1: If aspect ratio is provided directly
-    if (project.aspectRatio) {
-      return Math.floor(thumbnailHeight * project.aspectRatio);
-    }
-
-    // Method 2: If width and height are provided
-    if (project.width && project.height) {
-      return Math.floor((project.width / project.height) * thumbnailHeight);
-    }
-
-    // Method 3: If image dimensions are loaded from imageLoadStates
-    const loadState = imageLoadStates[project.id || index];
-    if (loadState && loadState.naturalWidth && loadState.naturalHeight) {
-      return Math.floor(
-        (loadState.naturalWidth / loadState.naturalHeight) * thumbnailHeight
-      );
-    }
-
-    // Fallback: square thumbnail while loading
-    return thumbnailHeight;
-  };
+  // Load image dimensions
+  const imageLoadStates = useImageLoader(projectList, thumbnailHeight);
 
   // Generate thumbnail widths based on image aspect ratios
   const generatedThumbnailWidths = useMemo(() => {
     return projectList.map((project, index) =>
-      calculateImageWidth(project, index)
+      calculateImageWidth(project, index, thumbnailHeight, imageLoadStates)
     );
   }, [projectList, thumbnailHeight, imageLoadStates]);
 
-  // Load image dimensions for projects that don't have aspect ratio data
-  useEffect(() => {
-    const loadImageDimensions = async () => {
-      const newLoadStates = { ...imageLoadStates };
-      let hasChanges = false;
-
-      for (let i = 0; i < projectList.length; i++) {
-        const project = projectList[i];
-        const projectKey = project.id || i;
-
-        // Skip if we already have dimensions or aspect ratio
-        if (
-          project.aspectRatio ||
-          (project.width && project.height) ||
-          newLoadStates[projectKey]
-        ) {
-          continue;
-        }
-
-        // Skip if no image URL
-        if (!project.imageUrl) {
-          continue;
-        }
-
-        try {
-          const img = new Image();
-          img.crossOrigin = "anonymous"; // Handle CORS for external images
-
-          await new Promise((resolve, reject) => {
-            img.onload = () => {
-              newLoadStates[projectKey] = {
-                naturalWidth: img.naturalWidth,
-                naturalHeight: img.naturalHeight,
-                loaded: true,
-              };
-              hasChanges = true;
-              resolve();
-            };
-            img.onerror = () => {
-              newLoadStates[projectKey] = {
-                naturalWidth: thumbnailHeight,
-                naturalHeight: thumbnailHeight,
-                loaded: true,
-                error: true,
-              };
-              hasChanges = true;
-              resolve(); // Don't reject, just use fallback
-            };
-            img.src = project.imageUrl;
-          });
-        } catch (error) {
-          console.warn(
-            `Failed to load image for project ${projectKey}:`,
-            error
-          );
-          newLoadStates[projectKey] = {
-            naturalWidth: thumbnailHeight,
-            naturalHeight: thumbnailHeight,
-            loaded: true,
-            error: true,
-          };
-          hasChanges = true;
-        }
-      }
-
-      if (hasChanges) {
-        setImageLoadStates(newLoadStates);
-      }
-    };
-
-    // Only load images if we have a valid thumbnail height
-    if (thumbnailHeight > 0) {
-      loadImageDimensions();
-    }
-  }, [projectList, thumbnailHeight]);
-
   // Calculate cumulative positions for each thumbnail
   const thumbnailPositions = useMemo(() => {
-    return generatedThumbnailWidths.reduce((acc, width, index) => {
-      if (index === 0) {
-        acc.push(0);
-      } else {
-        acc.push(
-          acc[index - 1] + generatedThumbnailWidths[index - 1] + dynamicGap
-        );
-      }
-      return acc;
-    }, []);
+    return calculateThumbnailPositions(generatedThumbnailWidths, dynamicGap);
   }, [generatedThumbnailWidths, dynamicGap]);
 
   // Calculate total width of all thumbnails
   const totalWidth = useMemo(() => {
-    if (thumbnailPositions.length === 0) return 0;
-    return (
-      thumbnailPositions[thumbnailPositions.length - 1] +
-      generatedThumbnailWidths[generatedThumbnailWidths.length - 1]
-    );
+    return calculateTotalWidth(thumbnailPositions, generatedThumbnailWidths);
   }, [thumbnailPositions, generatedThumbnailWidths]);
 
   // Boundary calculations
   const maxOffset = 0; // First thumbnail at 0 position
   const minOffset = useMemo(() => {
     if (generatedThumbnailWidths.length === 0) return 0;
-    return -totalWidth + generatedThumbnailWidths[0];
-  }, [totalWidth, generatedThumbnailWidths]);
 
-  const clampOffset = (offset) => {
-    return Math.max(minOffset, Math.min(maxOffset, offset));
-  };
+    // The thumbnails start at 16px from the left due to container padding
+    // To position the last thumbnail at 16px from left, we need:
+    // -(last thumbnail position + 16px initial offset) + 16px target position
+    // Which simplifies to: -(last thumbnail position + 16px)
+    const lastThumbnailPosition =
+      thumbnailPositions[thumbnailPositions.length - 1];
+    const containerPadding = 32; // The initial 16px offset from container padding
 
-  const calculateActiveThumbnail = (offset) => {
-    if (thumbnailPositions.length === 0) return 0;
+    return -(lastThumbnailPosition + containerPadding) + 16;
+  }, [thumbnailPositions]);
 
-    const adjustedOffset = -offset;
+  const clampOffsetFn = (offset) => clampOffset(offset, minOffset, maxOffset);
 
-    // Find which thumbnail position is closest to the current offset
-    let closestIndex = 0;
-    let closestDistance = Math.abs(adjustedOffset - thumbnailPositions[0]);
+  // Touch handling
+  const { isDragging, momentum, setMomentum } = useTouchHandling(
+    projectList,
+    scrollOffset,
+    setScrollOffset,
+    clampOffsetFn,
+    setIsKeyboardNavigating
+  );
 
-    for (let i = 1; i < thumbnailPositions.length; i++) {
-      const distance = Math.abs(adjustedOffset - thumbnailPositions[i]);
-      if (distance < closestDistance) {
-        closestDistance = distance;
-        closestIndex = i;
-      }
-    }
+  // Momentum handling
+  useMomentum(
+    momentum,
+    setMomentum,
+    projectList,
+    setScrollOffset,
+    clampOffsetFn
+  );
 
-    return closestIndex;
-  };
+  // Snap to position
+  const isSnapping = useSnapToPosition(
+    momentum,
+    isDragging,
+    isKeyboardNavigating,
+    activeThumbnail,
+    scrollOffset,
+    setScrollOffset,
+    thumbnailRefs,
+    clampOffsetFn
+  );
 
-  // Reset active thumbnail when projects change
+  // Reset active thumbnail when projects change and ensure we start at 0 offset
   useEffect(() => {
     if (activeThumbnail >= projectList.length) {
       setActiveThumbnail(0);
-      setScrollOffset(0);
+      setScrollOffset(0); // Explicitly reset to 0
     }
   }, [projectList.length, activeThumbnail]);
 
-  // Remove the IntersectionObserver effect and replace with collision detection
+  // Ensure we start at 0 offset when component mounts
+  useEffect(() => {
+    setScrollOffset(0);
+    setActiveThumbnail(0);
+  }, []);
+
+  // Collision detection for active thumbnail
   useEffect(() => {
     if (!cursorRef.current || projectList.length === 0) return;
 
@@ -345,6 +216,7 @@ export default function Home({home, thumbnailHeightVh = 12}) {
     return () => window.removeEventListener("resize", handleResize);
   }, [isKeyboardNavigating, projectList.length]);
 
+  // Wheel event handling
   useEffect(() => {
     if (projectList.length === 0) return;
 
@@ -358,21 +230,10 @@ export default function Home({home, thumbnailHeightVh = 12}) {
 
       setScrollOffset((prev) => {
         const newOffset = prev - scrollDelta * 0.5;
-        const clampedOffset = clampOffset(newOffset);
+        const clampedOffset = clampOffsetFn(newOffset);
         return clampedOffset;
       });
     });
-
-    // Separate throttled function for active thumbnail calculation
-    const updateActiveThumbnail = throttle((offset) => {
-      const calculatedActive = calculateActiveThumbnail(offset);
-      setActiveThumbnail(calculatedActive);
-    }, 16); // ~60fps
-
-    // Listen for scroll offset changes to update active thumbnail
-    const unsubscribe = () => {
-      updateActiveThumbnail(scrollOffset);
-    };
 
     window.addEventListener("wheel", handleWheel, { passive: false });
 
@@ -381,184 +242,20 @@ export default function Home({home, thumbnailHeightVh = 12}) {
     };
   }, [projectList.length, thumbnailPositions, minOffset, maxOffset]);
 
-  // Separate effect to update active thumbnail when scroll offset changes
+  // Update active thumbnail when scroll offset changes
   useEffect(() => {
     const updateActiveThumbnail = throttle((offset) => {
       if (!isKeyboardNavigating) {
-        const calculatedActive = calculateActiveThumbnail(offset);
+        const calculatedActive = calculateActiveThumbnail(
+          offset,
+          thumbnailPositions
+        );
         setActiveThumbnail(calculatedActive);
       }
     }, 16);
 
     updateActiveThumbnail(scrollOffset);
   }, [scrollOffset, isKeyboardNavigating, thumbnailPositions]);
-
-  // Touch event handlers - simplified and working version
-  useEffect(() => {
-    if (projectList.length === 0) return;
-
-    const handleTouchStart = (e) => {
-      setIsKeyboardNavigating(false);
-
-      const touch = e.touches[0];
-      setIsDragging(true);
-      setDragStart({
-        x: touch.clientX,
-        offset: scrollOffset,
-        time: Date.now(),
-      });
-      setMomentum(0);
-
-      // Store initial touch position for velocity calculation
-      setLastTouchMove({
-        x: touch.clientX,
-        time: Date.now(),
-      });
-    };
-
-    const handleTouchMove = (e) => {
-      if (!isDragging) return;
-
-      // Prevent default to avoid page scrolling
-      e.preventDefault();
-
-      const touch = e.touches[0];
-      const deltaX = touch.clientX - dragStart.x;
-      const newOffset = dragStart.offset + deltaX;
-      const clampedOffset = clampOffset(newOffset);
-
-      setScrollOffset(clampedOffset);
-
-      // Update last touch position for velocity calculation
-      setLastTouchMove({
-        x: touch.clientX,
-        time: Date.now(),
-      });
-    };
-
-    const handleTouchEnd = (e) => {
-      if (!isDragging) return;
-      setIsDragging(false);
-
-      // Calculate velocity for momentum
-      const endTime = Date.now();
-      const timeDiff = endTime - lastTouchMove.time;
-      const touch = e.changedTouches[0];
-      const distanceDiff = touch.clientX - lastTouchMove.x;
-
-      if (timeDiff > 0 && timeDiff < 100) {
-        // Only use recent movement
-        const velocity = (distanceDiff / timeDiff) * 16; // Scale for smooth momentum
-        if (Math.abs(velocity) > 1) {
-          setMomentum(velocity);
-        }
-      }
-    };
-
-    // Add event listeners to document for better touch handling
-    document.addEventListener("touchstart", handleTouchStart, {
-      passive: false,
-    });
-    document.addEventListener("touchmove", handleTouchMove, { passive: false });
-    document.addEventListener("touchend", handleTouchEnd, { passive: false });
-
-    return () => {
-      document.removeEventListener("touchstart", handleTouchStart);
-      document.removeEventListener("touchmove", handleTouchMove);
-      document.removeEventListener("touchend", handleTouchEnd);
-    };
-  }, [isDragging, dragStart, scrollOffset, lastTouchMove, projectList.length]);
-
-  // Enhanced momentum handling with snap-to-position
-  useEffect(() => {
-    if (momentum === 0 || projectList.length === 0) return;
-
-    let animationId;
-
-    const applyMomentum = () => {
-      setMomentum((prevMomentum) => {
-        const newMomentum = prevMomentum * 0.95; // Decay factor
-
-        if (Math.abs(newMomentum) < 0.1) {
-          return 0; // Stop momentum when it's too small
-        }
-
-        setScrollOffset((currentOffset) => {
-          const newOffset = currentOffset + newMomentum;
-          return clampOffset(newOffset);
-        });
-
-        // Continue animation
-        animationId = requestAnimationFrame(applyMomentum);
-        return newMomentum;
-      });
-    };
-
-    animationId = requestAnimationFrame(applyMomentum);
-
-    return () => {
-      if (animationId) {
-        cancelAnimationFrame(animationId);
-      }
-    };
-  }, [momentum, projectList.length]);
-
-  // Add snap-to-position effect that triggers when momentum stops
-  useEffect(() => {
-    if (momentum !== 0 || isDragging || isKeyboardNavigating) return;
-
-    const snapTimeout = setTimeout(() => {
-      const activeThumb = thumbnailRefs.current[activeThumbnail];
-      if (!activeThumb) return;
-
-      const thumbRect = activeThumb.getBoundingClientRect();
-      const targetPosition = 16; // 16px from left edge
-      const currentPosition = thumbRect.left;
-      const snapDistance = targetPosition - currentPosition;
-
-      // Only snap if we're more than 2px away from target
-      if (Math.abs(snapDistance) > 2) {
-        setIsSnapping(true);
-
-        // Calculate the required scroll offset adjustment
-        const requiredOffset = scrollOffset + snapDistance;
-        const clampedOffset = clampOffset(requiredOffset);
-
-        // Animate to the snap position
-        const startOffset = scrollOffset;
-        const startTime = performance.now();
-        const duration = 300; // 300ms snap animation
-
-        const animateSnap = (currentTime) => {
-          const elapsed = currentTime - startTime;
-          const progress = Math.min(elapsed / duration, 1);
-
-          // Easing function for smooth animation
-          const easeOut = 1 - Math.pow(1 - progress, 3);
-
-          const currentSnapOffset =
-            startOffset + (clampedOffset - startOffset) * easeOut;
-          setScrollOffset(currentSnapOffset);
-
-          if (progress < 1) {
-            requestAnimationFrame(animateSnap);
-          } else {
-            setIsSnapping(false);
-          }
-        };
-
-        requestAnimationFrame(animateSnap);
-      }
-    }, 200); // Wait 200ms after momentum stops
-
-    return () => clearTimeout(snapTimeout);
-  }, [
-    momentum,
-    isDragging,
-    isKeyboardNavigating,
-    activeThumbnail,
-    scrollOffset,
-  ]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -590,17 +287,17 @@ export default function Home({home, thumbnailHeightVh = 12}) {
           // Update active thumbnail immediately
           setActiveThumbnail(newActive);
 
-          // Calculate the offset needed to align this thumbnail at position 0
-          const targetOffset = -thumbnailPositions[newActive];
-          const clampedOffset = clampOffset(targetOffset);
+          // Calculate the offset needed to align this thumbnail at 16px from left
+          const targetOffset = -thumbnailPositions[newActive] + 16;
+          const clampedOffset = clampOffsetFn(targetOffset);
 
           setScrollOffset(clampedOffset);
         }
 
-        // Reset keyboard navigation mode after a short delay
+        // Reset keyboard navigation mode after a longer delay to prevent snap interference
         setTimeout(() => {
           setIsKeyboardNavigating(false);
-        }, 300);
+        }, 500); // Increased from 300ms to 500ms
       }
     };
 
@@ -617,18 +314,37 @@ export default function Home({home, thumbnailHeightVh = 12}) {
     // Reset keyboard navigation mode
     setIsKeyboardNavigating(false);
 
-    const targetOffset = -thumbnailPositions[index];
-    const clampedOffset = clampOffset(targetOffset);
+    // Calculate offset to position this thumbnail at 16px from left edge
+    const targetOffset = -thumbnailPositions[index] + 16;
+    const clampedOffset = clampOffsetFn(targetOffset);
 
     setScrollOffset(clampedOffset);
     setActiveThumbnail(index);
   };
 
+  // Determine if we should show loading screen
+  const showLoading = isLoading || internalLoading;
+  const currentProgress = isLoading ? loadingProgress : internalProgress;
+
+  // Show preloader screen
+  if (showLoading) {
+    return (
+      <Preloader
+        progress={currentProgress}
+        onComplete={onLoadComplete}
+        loadingText={loadingText}
+      />
+    );
+  }
+
   return (
     <main className="work">
       <div className="scroll-container">
         <div
-          style={{ transform: `translateX(${scrollOffset}px)`, gap: dynamicGap }}
+          style={{
+            transform: `translateX(${scrollOffset}px)`,
+            gap: dynamicGap,
+          }}
           className="work__container"
         >
           <div
@@ -640,7 +356,11 @@ export default function Home({home, thumbnailHeightVh = 12}) {
               alt={home.assets[activeThumbnail].alt}
             />
           </div>
-          <div className="cursor" ref={cursorRef} style={{ transform: `translateX(${-scrollOffset}px)` }} />
+          <div
+            className="cursor"
+            ref={cursorRef}
+            style={{ transform: `translateX(${-scrollOffset}px)` }}
+          />
           {home.assets.map((asset, index) => {
             return (
               <div
@@ -660,13 +380,11 @@ export default function Home({home, thumbnailHeightVh = 12}) {
 }
 
 export const getStaticProps = async () => {
-
   const home = await getPropData(getHome);
 
   return {
     props: {
-      ...home
+      ...home,
     },
   };
-
-}
+};
