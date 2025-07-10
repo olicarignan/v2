@@ -230,7 +230,7 @@ export default function Home({ home, thumbnailHeightVh = 12, projects=[], isLoad
 
       setScrollOffset((prev) => {
         const newOffset = prev - scrollDelta * 0.5;
-        const clampedOffset = clampOffsetFn(newOffset);
+        const clampedOffset = clampOffset(newOffset, minOffset, maxOffset);
         return clampedOffset;
       });
     });
@@ -287,9 +287,22 @@ export default function Home({ home, thumbnailHeightVh = 12, projects=[], isLoad
           // Update active thumbnail immediately
           setActiveThumbnail(newActive);
 
-          // Calculate the offset needed to align this thumbnail at 16px from left
-          const targetOffset = -thumbnailPositions[newActive] + 16;
-          const clampedOffset = clampOffsetFn(targetOffset);
+          // Calculate the distance to move based on the direction
+          let scrollDistance = 0;
+
+          if (e.key === "ArrowRight") {
+            // Moving right: scroll by the width of the current thumbnail + gap
+            scrollDistance = -(
+              generatedThumbnailWidths[currentActive] + dynamicGap
+            );
+          } else {
+            // Moving left: scroll by the width of the previous thumbnail + gap
+            scrollDistance = generatedThumbnailWidths[newActive] + dynamicGap;
+          }
+
+          // Apply the scroll distance to current offset
+          const newOffset = scrollOffset + scrollDistance;
+          const clampedOffset = clampOffset(newOffset, minOffset, maxOffset);
 
           setScrollOffset(clampedOffset);
         }
@@ -306,7 +319,13 @@ export default function Home({ home, thumbnailHeightVh = 12, projects=[], isLoad
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [projectList.length, thumbnailPositions, activeThumbnail]);
+  }, [
+    projectList.length,
+    activeThumbnail,
+    scrollOffset,
+    generatedThumbnailWidths,
+    dynamicGap,
+  ]);
 
   const handleThumbnailClick = (index) => {
     if (index >= thumbnailPositions.length) return;
@@ -316,7 +335,7 @@ export default function Home({ home, thumbnailHeightVh = 12, projects=[], isLoad
 
     // Calculate offset to position this thumbnail at 16px from left edge
     const targetOffset = -thumbnailPositions[index] + 16;
-    const clampedOffset = clampOffsetFn(targetOffset);
+    const clampedOffset = clampOffset(targetOffset, minOffset, maxOffset);
 
     setScrollOffset(clampedOffset);
     setActiveThumbnail(index);
@@ -345,7 +364,7 @@ export default function Home({ home, thumbnailHeightVh = 12, projects=[], isLoad
             transform: `translateX(${scrollOffset}px)`,
             gap: dynamicGap,
           }}
-          className="work__container"
+          className={`work__container${isDragging ? " dragging" : ""}`}
         >
           <div
             className="featured"
