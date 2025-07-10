@@ -16,7 +16,7 @@
     will-change: transform;
     transform: translateZ(0);
     backface-visibility: hidden;
-    transition: transform 0.1s ease-out;
+    transition: transform 0.3s ease-out;
   }
 
   .work__container.dragging {
@@ -53,7 +53,7 @@
     will-change: transform;
     transform: translateZ(0);
     backface-visibility: hidden;
-    transition: transform 0.1s ease-out;
+    transition: transform 0.3s ease-out;
 
     img {
       height: 100%;

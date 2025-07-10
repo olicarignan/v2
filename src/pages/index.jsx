@@ -349,17 +349,43 @@ export default function Home({ home, thumbnailHeightVh = 12, projects=[], isLoad
   const handleThumbnailClick = (index) => {
     if (index >= thumbnailPositions.length) return;
 
-    // Reset keyboard navigation mode
+    // Reset keyboard navigation mode and momentum
     setIsKeyboardNavigating(false);
+    setMomentum(0); // Reset any existing momentum
 
-    // Calculate offset to position this thumbnail at 16px from left edge
-    const targetOffset = -thumbnailPositions[index];
+    // Only manipulate transitions on non-touch devices
+    const thumbnailGrid = document.querySelector(".work__container");
+    const featured = document.querySelector(".featured");
+    let hadTransition = false;
+
+    if (!isTouchDevice && thumbnailGrid) {
+      hadTransition = thumbnailGrid.style.transition !== "none";
+      hadTransition = featured.style.transition !== "none";
+      thumbnailGrid.style.transition = "none";
+      featured.style.transition = "none";
+    }
+
+    // Calculate the position of the clicked thumbnail
+    let clickedThumbnailPosition = 0;
+    for (let i = 0; i < index; i++) {
+      clickedThumbnailPosition += generatedThumbnailWidths[i] + dynamicGap;
+    }
+
+    // The target is to position the clicked thumbnail at 16px from the left edge of the viewport
+    const targetOffset = -clickedThumbnailPosition;
     const clampedOffset = clampOffset(targetOffset, minOffset, maxOffset);
 
-    console.log(targetOffset, clampedOffset);
-
+    // Set the position immediately without transition
     setScrollOffset(clampedOffset);
     setActiveThumbnail(index);
+
+    // Re-enable transition only on non-touch devices and only if it was enabled before
+    if (!isTouchDevice && thumbnailGrid && hadTransition) {
+      setTimeout(() => {
+        thumbnailGrid.style.transition = "transform 0.3s ease-out";
+        featured.style.transition = "transform 0.3s ease-out";
+      }, 50);
+    }
   };
 
   // Determine if we should show loading screen

@@ -67,7 +67,7 @@ export const useSnapToPosition = (
 
         requestAnimationFrame(animateSnap);
       }
-    }, 200); // Wait 200ms after momentum stops
+    }, 50); // Wait 200ms after momentum stops
 
     return () => clearTimeout(snapTimeout);
   }, [
