@@ -31,6 +31,21 @@ export default function Home({ home, thumbnailHeightVh = 12, projects=[], isLoad
 
   // Track if we're in keyboard navigation mode to prevent interference
   const [isKeyboardNavigating, setIsKeyboardNavigating] = useState(false);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+
+  // Check if we're on a touch device
+  useEffect(() => {
+    const checkTouchDevice = () => {
+      setIsTouchDevice(
+        "ontouchstart" in window || navigator.maxTouchPoints > 0
+      );
+    };
+
+    checkTouchDevice();
+    window.addEventListener("resize", checkTouchDevice);
+
+    return () => window.removeEventListener("resize", checkTouchDevice);
+  }, []);
 
   // Custom hooks
   const { viewportHeight, viewportWidth } = useViewport();
@@ -88,7 +103,7 @@ export default function Home({ home, thumbnailHeightVh = 12, projects=[], isLoad
       thumbnailPositions[thumbnailPositions.length - 1];
     const containerPadding = 32; // The initial 16px offset from container padding
 
-    return -(lastThumbnailPosition + containerPadding) + 16;
+    return -(lastThumbnailPosition + containerPadding);
   }, [thumbnailPositions]);
 
   const clampOffsetFn = (offset) => clampOffset(offset, minOffset, maxOffset);
@@ -99,17 +114,21 @@ export default function Home({ home, thumbnailHeightVh = 12, projects=[], isLoad
     scrollOffset,
     setScrollOffset,
     clampOffsetFn,
-    setIsKeyboardNavigating
+    setIsKeyboardNavigating,
+    isTouchDevice
   );
 
-  // Momentum handling
-  useMomentum(
+  // Momentum handling - only on non-touch devices
+  const momentumEffect = useMomentum(
     momentum,
     setMomentum,
     projectList,
     setScrollOffset,
     clampOffsetFn
   );
+  const momentumEffectMemo = useMemo(() => {
+    return momentumEffect;
+  }, [momentumEffect]);
 
   // Snap to position
   const isSnapping = useSnapToPosition(
@@ -334,8 +353,10 @@ export default function Home({ home, thumbnailHeightVh = 12, projects=[], isLoad
     setIsKeyboardNavigating(false);
 
     // Calculate offset to position this thumbnail at 16px from left edge
-    const targetOffset = -thumbnailPositions[index] + 16;
+    const targetOffset = -thumbnailPositions[index];
     const clampedOffset = clampOffset(targetOffset, minOffset, maxOffset);
+
+    console.log(targetOffset, clampedOffset);
 
     setScrollOffset(clampedOffset);
     setActiveThumbnail(index);
@@ -363,12 +384,16 @@ export default function Home({ home, thumbnailHeightVh = 12, projects=[], isLoad
           style={{
             transform: `translateX(${scrollOffset}px)`,
             gap: dynamicGap,
+            transition: isTouchDevice ? "none" : undefined,
           }}
           className={`work__container${isDragging ? " dragging" : ""}`}
         >
           <div
             className="featured"
-            style={{ transform: `translateX(${-scrollOffset}px)` }}
+            style={{
+              transform: `translateX(${-scrollOffset}px)`,
+              transition: isTouchDevice ? "none" : undefined,
+            }}
           >
             <img
               src={home.assets[activeThumbnail].url}
@@ -386,9 +411,9 @@ export default function Home({ home, thumbnailHeightVh = 12, projects=[], isLoad
                 className={`item${index === activeThumbnail ? " active" : ""}`}
                 key={asset.id}
                 ref={(el) => (thumbnailRefs.current[index] = el)}
-                onClick={() => handleThumbnailClick(i)}
+                onClick={() => handleThumbnailClick(index)}
               >
-                <img src={asset.url} alt={asset.alt} />
+                <img src={asset.url} alt={asset.alt} draggable="false" />
               </div>
             );
           })}

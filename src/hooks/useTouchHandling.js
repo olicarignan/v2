@@ -7,7 +7,8 @@ export const useTouchHandling = (
   scrollOffset,
   setScrollOffset,
   clampOffsetFn,
-  setIsKeyboardNavigating
+  setIsKeyboardNavigating,
+  isTouchDevice = false // Add this parameter
 ) => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, offset: 0, time: 0 });
@@ -50,28 +51,33 @@ export const useTouchHandling = (
 
       setScrollOffset(clampedOffset);
 
-      // Update last touch position for velocity calculation
-      setLastTouchMove({
-        x: touch.clientX,
-        time: Date.now(),
-      });
+      // Update last touch position for velocity calculation (only if momentum is enabled)
+      if (!isTouchDevice) {
+        setLastTouchMove({
+          x: touch.clientX,
+          time: Date.now(),
+        });
+      }
     };
 
     const handleTouchEnd = (e) => {
       if (!isDragging) return;
       setIsDragging(false);
 
-      // Calculate velocity for momentum
-      const endTime = Date.now();
-      const timeDiff = endTime - lastTouchMove.time;
-      const touch = e.changedTouches[0];
-      const distanceDiff = touch.clientX - lastTouchMove.x;
+      // Only calculate momentum on non-touch devices (for trackpad/mouse drag simulation)
+      if (!isTouchDevice) {
+        // Calculate velocity for momentum
+        const endTime = Date.now();
+        const timeDiff = endTime - lastTouchMove.time;
+        const touch = e.changedTouches[0];
+        const distanceDiff = touch.clientX - lastTouchMove.x;
 
-      if (timeDiff > 0 && timeDiff < 100) {
-        // Only use recent movement
-        const velocity = (distanceDiff / timeDiff) * 16; // Scale for smooth momentum
-        if (Math.abs(velocity) > 1) {
-          setMomentum(velocity);
+        if (timeDiff > 0 && timeDiff < 100) {
+          // Only use recent movement
+          const velocity = (distanceDiff / timeDiff) * 16; // Scale for smooth momentum
+          if (Math.abs(velocity) > 1) {
+            setMomentum(velocity);
+          }
         }
       }
     };
@@ -97,6 +103,7 @@ export const useTouchHandling = (
     clampOffsetFn,
     setIsKeyboardNavigating,
     setScrollOffset,
+    isTouchDevice, // Add this dependency
   ]);
 
   return { isDragging, momentum, setMomentum };
