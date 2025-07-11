@@ -6,6 +6,7 @@ import {
   useEffect,
   useMemo,
 } from "react";
+import { motion, stagger }  from "motion/react"
 
 import { useViewport } from "@/hooks/useViewport";
 import { useInternalLoading } from "@/hooks/useInternalLoading";
@@ -25,7 +26,7 @@ import {
   clampOffset,
   calculateActiveThumbnail,
 } from "@/utils/helpers";
-
+import { anim } from "@/utils/animate";
 import Layout from "@/layouts/Layout";
 
 export default function Home({
@@ -417,11 +418,118 @@ export default function Home({
   //   );
   // }
 
+  const featuredImage = {
+    initial: {
+      opacity: 0.25,
+      x: "-100%"
+    },
+    enter: {
+      opacity: 1,
+      x: 0,
+      transition: {
+        type: "tween",
+        duration: 1,
+        ease: [0, 0.55, 0.45, 1],
+      },
+    },
+    exit: {
+      opacity: 0.25,
+      x: "-100%",
+      transition: {
+        duration: 0.5,
+        type: "tween",
+      }
+    },
+  };
+
+  const pageAnimation = {
+    initial: {
+      transition: {
+        staggerChildren: (0.05, { from: "last" }),
+      },
+    },
+    enter: {
+      transition: {
+        staggerChildren: 0.05,
+      },
+    },
+    exit: {
+      transition: {
+        duration: 0.5,
+        staggerChildren: (0.05, { from: "last" }),
+      },
+    },
+  };
+
+  const thumbnailAnimation = {
+    initial: {
+      y: "100%",
+      opacity: 0.5,
+      transition: {
+        duration: 0.5,
+        type: "tween",
+        ease: [0, 0.55, 0.45, 1],
+      },
+    },
+    enter: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.5,
+        type: "tween",
+        ease: [0, 0.55, 0.45, 1],
+      },
+    },
+    exit: {
+      y: 0,
+      opacity: 0.5,
+      transition: {
+        duration: 0.5,
+        type: "tween",
+        ease: [0, 0.55, 0.45, 1],
+      },
+    }
+  }
+  // const pageAnimation = {
+  //   hidden: {
+  //     transition: {
+  //       staggerChildren: (0.05, {from: "last"}),
+  //     },
+  //   },
+  //   visible: {
+  //     transition: {
+  //       staggerChildren: 0.05,
+  //     },
+  //   },
+  // };
+
+  // const thumbnailAnimation = {
+  //   hidden: {
+  //     y: "100%",
+  //     opacity: 0.5,
+  //     transition: {
+  //       duration: 0.5,
+  //       type: "tween",
+  //       ease: [0, 0.55, 0.45, 1],
+  //     },
+  //   },
+  //   visible: {
+  //     y: 0,
+  //     opacity: 1,
+  //     transition: {
+  //       duration: 0.5,
+  //       type: "tween",
+  //       ease: [0, 0.55, 0.45, 1],
+  //     },
+  //   }
+  // }
+
   return (
     <Layout>
       <main className="work">
         <div className="scroll-container">
-          <div
+          <motion.div
+            variants={pageAnimation}
             style={{
               transform: `translateX(${scrollOffset}px)`,
               gap: dynamicGap,
@@ -436,7 +544,8 @@ export default function Home({
                 transition: isTouchDevice ? "none" : undefined,
               }}
             >
-              <img
+              <motion.img
+                {...anim(featuredImage)}
                 ref={featuredRef}
                 src={home.assets[activeThumbnail].url}
                 alt={home.assets[activeThumbnail].alt}
@@ -449,7 +558,8 @@ export default function Home({
             />
             {home.assets.map((asset, index) => {
               return (
-                <div
+                <motion.div
+                  variants={thumbnailAnimation}
                   className={`item${
                     index === activeThumbnail ? " active" : ""
                   }`}
@@ -458,10 +568,10 @@ export default function Home({
                   onClick={() => handleThumbnailClick(index)}
                 >
                   <img src={asset.url} alt={asset.alt} draggable="false" />
-                </div>
+                </motion.div>
               );
             })}
-          </div>
+          </motion.div>
         </div>
       </main>
     </Layout>
