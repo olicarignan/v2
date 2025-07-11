@@ -1,6 +1,8 @@
 .work {
   --100dvh: calc(var(--vh, 1dvh) * 100);
 
+  width: 100vw;
+  height: var(--100dvh);
   grid-column: 1 / -1;
   position: relative;
 

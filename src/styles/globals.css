@@ -5,7 +5,8 @@
 @import "./base/fonts.css";
 @import "./base/grid.css";
 
-@import "./components/nav.css";
-
 @import "./pages/work.css";
 @import "./pages/info.css";
+
+@import "./components/nav.css";
+@import "./components/layout.css";

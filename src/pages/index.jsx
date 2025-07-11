@@ -1,6 +1,11 @@
 "use client";
 
-import { useRef, useState, useEffect, useMemo, use, useContext } from "react";
+import {
+  useRef,
+  useState,
+  useEffect,
+  useMemo,
+} from "react";
 
 import { useViewport } from "@/hooks/useViewport";
 import { useInternalLoading } from "@/hooks/useInternalLoading";
@@ -9,10 +14,6 @@ import { useSnapToPosition } from "@/hooks/useSnapToPosition";
 import { useTouchHandling } from "@/hooks/useTouchHandling";
 import { useImageLoader } from "@/hooks/useImageLoader";
 
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
-
-import { TransitionContext } from "@/context/TransitionProvider";
 import { getPropData } from "@/utils/propData";
 import { getHome } from "@/gql/queries";
 import {
@@ -25,6 +26,8 @@ import {
   calculateActiveThumbnail,
 } from "@/utils/helpers";
 
+import Layout from "@/layouts/Layout";
+
 export default function Home({
   home,
   thumbnailHeightVh = 12,
@@ -36,28 +39,13 @@ export default function Home({
 }) {
   const [scrollOffset, setScrollOffset] = useState(0);
   const [activeThumbnail, setActiveThumbnail] = useState(0);
-  const { timeline } = useContext(TransitionContext);
   const thumbnailRefs = useRef([]);
   const cursorRef = useRef(null);
   const featuredRef = useRef(null);
-  const container = useRef(null);
 
   // Track if we're in keyboard navigation mode to prevent interference
   const [isKeyboardNavigating, setIsKeyboardNavigating] = useState(false);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
-
-  useGSAP(
-    () => {
-      const thumbnails = gsap.utils.toArray(thumbnailRefs.current);
-
-      gsap.fromTo(thumbnails, {y: "100%"}, {y: 0, duration: 1, stagger: 0.025});
-      gsap.fromTo(featuredRef.current, {x: "-100%"}, {x: 0, duration: 1});
-
-      timeline.to(thumbnails, {y: "110%", duration: 1, stagger: 0.025}, 0)
-      timeline.to(featuredRef.current, {x: "-100%", duration: 1}, 0)
-    },
-    { scope: container }
-  );
 
   // Check if we're on a touch device
   useEffect(() => {
@@ -430,49 +418,53 @@ export default function Home({
   // }
 
   return (
-    <main className="work" ref={container}>
-      <div className="scroll-container">
-        <div
-          style={{
-            transform: `translateX(${scrollOffset}px)`,
-            gap: dynamicGap,
-            transition: isTouchDevice ? "none" : undefined,
-          }}
-          className={`work__container${isDragging ? " dragging" : ""}`}
-        >
+    <Layout>
+      <main className="work">
+        <div className="scroll-container">
           <div
-            className="featured"
             style={{
-              transform: `translateX(${-scrollOffset}px)`,
+              transform: `translateX(${scrollOffset}px)`,
+              gap: dynamicGap,
               transition: isTouchDevice ? "none" : undefined,
             }}
+            className={`work__container${isDragging ? " dragging" : ""}`}
           >
-            <img
-              ref={featuredRef}
-              src={home.assets[activeThumbnail].url}
-              alt={home.assets[activeThumbnail].alt}
+            <div
+              className="featured"
+              style={{
+                transform: `translateX(${-scrollOffset}px)`,
+                transition: isTouchDevice ? "none" : undefined,
+              }}
+            >
+              <img
+                ref={featuredRef}
+                src={home.assets[activeThumbnail].url}
+                alt={home.assets[activeThumbnail].alt}
+              />
+            </div>
+            <div
+              className="cursor"
+              ref={cursorRef}
+              style={{ transform: `translateX(${-scrollOffset}px)` }}
             />
+            {home.assets.map((asset, index) => {
+              return (
+                <div
+                  className={`item${
+                    index === activeThumbnail ? " active" : ""
+                  }`}
+                  key={asset.id}
+                  ref={(el) => (thumbnailRefs.current[index] = el)}
+                  onClick={() => handleThumbnailClick(index)}
+                >
+                  <img src={asset.url} alt={asset.alt} draggable="false" />
+                </div>
+              );
+            })}
           </div>
-          <div
-            className="cursor"
-            ref={cursorRef}
-            style={{ transform: `translateX(${-scrollOffset}px)` }}
-          />
-          {home.assets.map((asset, index) => {
-            return (
-              <div
-                className={`item${index === activeThumbnail ? " active" : ""}`}
-                key={asset.id}
-                ref={(el) => (thumbnailRefs.current[index] = el)}
-                onClick={() => handleThumbnailClick(index)}
-              >
-                <img src={asset.url} alt={asset.alt} draggable="false" />
-              </div>
-            );
-          })}
         </div>
-      </div>
-    </main>
+      </main>
+    </Layout>
   );
 }
 

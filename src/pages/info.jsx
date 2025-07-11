@@ -1,36 +1,15 @@
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
-import { useContext, useRef } from "react";
+"use client";
 
-import { TransitionContext } from "@/context/TransitionProvider";
 import { getPropData } from "@/utils/propData";
 import { getInfo } from "@/gql/queries.js";
 
-export default function Info({ info }) {
-  const container = useRef(null);
-  const { clients, services } = info;
-  const { timeline } = useContext(TransitionContext);
+import Layout from "@/layouts/Layout";
 
-  useGSAP(
-    () => {
-      gsap.fromTo(
-        container.current,
-        { opacity: 0 },
-        { opacity: 1, duration: 0.3, ease: "power1.inOut" }
-      );
-      timeline.add(
-        gsap.to(container.current, {
-          opacity: 0,
-          duration: 0.3,
-          ease: "power1.inOut",
-        })
-      );
-    },
-    { scope: container }
-  );
+export default function Info({ info }) {
+  const { clients, services } = info;
 
   return (
-    <div className="grid" ref={container}>
+    <Layout>
       <main className="info">
         <div className="hero">
           <p>
@@ -93,7 +72,7 @@ export default function Info({ info }) {
           </article>
         </div>
       </main>
-    </div>
+    </Layout>
   );
 }
 

@@ -22,6 +22,10 @@
     flex-direction: column;
     gap: 5.6rem;
 
+    li {
+      font-weight: 300;
+    }
+
     .contact {
       order: var(--contact-order);
       display: flex;
