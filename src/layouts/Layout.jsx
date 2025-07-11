@@ -1,24 +1,17 @@
 import { motion } from "motion/react";
 import { useRouter } from "next/router";
+
 import Nav from "@/components/Nav";
+import { anim } from "@/utils/animate";
 
 export default function Layout({ children}) {
 
   const router = useRouter();
 
-  const anim = (variants) => {
-    return {
-      initial: "initial",
-      animate: "enter",
-      exit: "exit",
-      variants,
-    };
-  };
-
   const opacity = {
     initial: { opacity: 0 },
     enter: { opacity: 1,
-      duration: 0.5
+      duration: 0.2
      },
     exit: { opacity: 1 },
   };
@@ -50,7 +43,7 @@ export default function Layout({ children}) {
     exit: {
       x: router.pathname === "/" ? 150 : -150,
       opacity: 0.5,
-      transition: { duration: 1.2, ease: [0.85, 0, 0.15, 1] },
+      transition: { duration: 1, ease: [0.85, 0, 0.15, 1] },
     }
 
   }

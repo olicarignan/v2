@@ -1,12 +1,61 @@
 "use client";
 
+import { delay, motion, stagger } from "motion/react";
+
 import { getPropData } from "@/utils/propData";
 import { getInfo } from "@/gql/queries.js";
 
 import Layout from "@/layouts/Layout";
+import { anim } from "@/utils/animate";
 
 export default function Info({ info }) {
   const { clients, services } = info;
+
+  const line = {
+    initial: {
+      width: 0,
+    },
+    enter: {
+      width: "100%",
+      transition: {
+        duration: 0.3,
+        ease: [0, 0.55, 0.45, 1],
+      },
+    },
+    exit: {
+      width: 0,
+    },
+  };
+
+  const body = {
+    hidden: {
+      opacity: 0,
+    },
+    visible: {
+      opacity: 1,
+      transition: {
+        duration: 0.3,
+        ease: [0, 0.55, 0.45, 1],
+        when: "beforeChildren",
+        staggerChildren: 0.05,
+      }
+    }
+  }
+
+  const article = {
+    hidden: {
+      opacity: 0,
+      y: "-100%",
+      transition: { duration: 0.5, ease: [0, 0.55, 0.45, 1] },
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5, ease: [0, 0.55, 0.45, 1] },
+    }
+  };
+
+
 
   return (
     <Layout>
@@ -26,8 +75,9 @@ export default function Info({ info }) {
           </p>
         </div>
 
-        <div className="body">
-          <article className="contact">
+        <motion.div {...anim(line)} className="divider"/>
+        <motion.div variants={body} animate="visible" initial="hidden" className="body">
+          <motion.article variants={article} className="contact">
             <h2>Contact</h2>
             <p>
               If you would like more information about my practice or want to
@@ -51,26 +101,26 @@ export default function Info({ info }) {
                 </a>
               </span>
             </div>
-          </article>
+          </motion.article>
 
-          <article className="services">
+          <motion.article variants={article} className="services">
             <h2>Services</h2>
             <ul>
               {services.map((service) => {
                 return <li key={service.id}>{service.listItem}</li>;
               })}
             </ul>
-          </article>
+          </motion.article>
 
-          <article className="clients">
+          <motion.article variants={article} className="clients">
             <h2>Clients</h2>
             <ul>
               {clients.map((client) => {
                 return <li key={client.id}>{client.listItem}</li>;
               })}
             </ul>
-          </article>
-        </div>
+          </motion.article>
+        </motion.div>
       </main>
     </Layout>
   );
