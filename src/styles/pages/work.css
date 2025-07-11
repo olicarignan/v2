@@ -33,6 +33,9 @@
     display: flex;
     cursor: pointer;
     user-select: none;
+    will-change: transform;
+    transform: translateZ(0);
+    backface-visibility: hidden;
 
     img {
       height: 100%;
@@ -54,6 +57,7 @@
     transform: translateZ(0);
     backface-visibility: hidden;
     transition: transform 0.3s ease-out;
+    overflow: hidden;
 
     img {
       height: 100%;

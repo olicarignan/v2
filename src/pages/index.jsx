@@ -1,8 +1,6 @@
 "use client";
 
-import { useRef, useState, useEffect, useMemo } from "react";
-
-import Preloader from "@/components/Preloader";
+import { useRef, useState, useEffect, useMemo, use, useContext } from "react";
 
 import { useViewport } from "@/hooks/useViewport";
 import { useInternalLoading } from "@/hooks/useInternalLoading";
@@ -11,6 +9,10 @@ import { useSnapToPosition } from "@/hooks/useSnapToPosition";
 import { useTouchHandling } from "@/hooks/useTouchHandling";
 import { useImageLoader } from "@/hooks/useImageLoader";
 
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
+
+import { TransitionContext } from "@/context/TransitionProvider";
 import { getPropData } from "@/utils/propData";
 import { getHome } from "@/gql/queries";
 import {
@@ -23,15 +25,39 @@ import {
   calculateActiveThumbnail,
 } from "@/utils/helpers";
 
-export default function Home({ home, thumbnailHeightVh = 12, projects=[], isLoading=false, loadingProgress=0, loadingText="Loading Portfolio", onLoadComplete }) {
+export default function Home({
+  home,
+  thumbnailHeightVh = 12,
+  projects = [],
+  isLoading = false,
+  loadingProgress = 0,
+  loadingText = "Loading Portfolio",
+  onLoadComplete,
+}) {
   const [scrollOffset, setScrollOffset] = useState(0);
   const [activeThumbnail, setActiveThumbnail] = useState(0);
+  const { timeline } = useContext(TransitionContext);
   const thumbnailRefs = useRef([]);
   const cursorRef = useRef(null);
+  const featuredRef = useRef(null);
+  const container = useRef(null);
 
   // Track if we're in keyboard navigation mode to prevent interference
   const [isKeyboardNavigating, setIsKeyboardNavigating] = useState(false);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
+
+  useGSAP(
+    () => {
+      const thumbnails = gsap.utils.toArray(thumbnailRefs.current);
+
+      gsap.fromTo(thumbnails, {y: "100%"}, {y: 0, duration: 1, stagger: 0.025});
+      gsap.fromTo(featuredRef.current, {x: "-100%"}, {x: 0, duration: 1});
+
+      timeline.to(thumbnails, {y: "110%", duration: 1, stagger: 0.025}, 0)
+      timeline.to(featuredRef.current, {x: "-100%", duration: 1}, 0)
+    },
+    { scope: container }
+  );
 
   // Check if we're on a touch device
   useEffect(() => {
@@ -388,23 +414,23 @@ export default function Home({ home, thumbnailHeightVh = 12, projects=[], isLoad
     }
   };
 
-  // Determine if we should show loading screen
-  const showLoading = isLoading || internalLoading;
-  const currentProgress = isLoading ? loadingProgress : internalProgress;
+  // // Determine if we should show loading screen
+  // const showLoading = isLoading || internalLoading;
+  // const currentProgress = isLoading ? loadingProgress : internalProgress;
 
-  // Show preloader screen
-  if (showLoading) {
-    return (
-      <Preloader
-        progress={currentProgress}
-        onComplete={onLoadComplete}
-        loadingText={loadingText}
-      />
-    );
-  }
+  // // Show preloader screen
+  // if (showLoading) {
+  //   return (
+  //     <Preloader
+  //       progress={currentProgress}
+  //       onComplete={onLoadComplete}
+  //       loadingText={loadingText}
+  //     />
+  //   );
+  // }
 
   return (
-    <main className="work">
+    <main className="work" ref={container}>
       <div className="scroll-container">
         <div
           style={{
@@ -422,6 +448,7 @@ export default function Home({ home, thumbnailHeightVh = 12, projects=[], isLoad
             }}
           >
             <img
+              ref={featuredRef}
               src={home.assets[activeThumbnail].url}
               alt={home.assets[activeThumbnail].alt}
             />

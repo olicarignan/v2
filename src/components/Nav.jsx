@@ -36,12 +36,15 @@ export default function Nav() {
         <Link className={"menu__item item--first " + isActive("/")} href="/">
           Work
         </Link>
-        <Link className={"menu__item item--second " + isActive("/info")} href="/info">
+        <Link
+          className={"menu__item item--second " + isActive("/info")}
+          href="/info"
+        >
           Info
         </Link>
       </div>
       <div className="clock">
-        <span className="time">
+        <span className="time" suppressHydrationWarning>
           {time.toLocaleTimeString([], {
             hour: "2-digit",
             minute: "2-digit",
