@@ -2,9 +2,9 @@ import { GraphQLClient } from "graphql-request";
 
 export async function getPropData(query) {
 
-  const client = new GraphQLClient(process.env.DATO_ENDPOINT, {
+  const client = new GraphQLClient(process.env.NEXT_PUBLIC_DATO_ENDPOINT, {
     headers: {
-      Authorization: `Bearer ${process.env.DATO_API_KEY}`,
+      Authorization: `Bearer ${process.env.NEXT_PUBLIC_DATO_API_KEY}`,
     },
   });
 
@@ -13,3 +13,16 @@ export async function getPropData(query) {
   return data;
 
 }
+
+export const graphqlClient = new GraphQLClient(
+  process.env.NEXT_PUBLIC_DATO_ENDPOINT,
+  {
+    headers: {
+      Authorization: `Bearer ${process.env.NEXT_PUBLIC_DATO_API_KEY}`,
+    },
+  }
+);
+
+export const fetcher = (query, variables) => {
+  return graphqlClient.request(query, variables);
+};

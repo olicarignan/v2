@@ -15,8 +15,8 @@ import { useSnapToPosition } from "@/hooks/useSnapToPosition";
 import { useTouchHandling } from "@/hooks/useTouchHandling";
 import { useImageLoader } from "@/hooks/useImageLoader";
 
-import { getPropData } from "@/utils/propData";
-import { getHome } from "@/gql/queries";
+// import { getPropData } from "@/utils/propData";
+// import { getHome } from "@/gql/queries";
 import {
   throttle,
   rafThrottle,
@@ -91,9 +91,9 @@ export default function Home({
   // Generate thumbnail widths based on image aspect ratios
   const generatedThumbnailWidths = useMemo(() => {
     return projectList.map((project, index) =>
-      calculateImageWidth(project, index, thumbnailHeight, imageLoadStates)
+      calculateImageWidth(project, index, thumbnailHeight)
     );
-  }, [projectList, thumbnailHeight, imageLoadStates]);
+  }, [projectList, thumbnailHeight]);
 
   // Calculate cumulative positions for each thumbnail
   const thumbnailPositions = useMemo(() => {
@@ -428,8 +428,9 @@ export default function Home({
       x: 0,
       transition: {
         type: "tween",
-        duration: 1,
+        duration: 0.75,
         ease: [0, 0.55, 0.45, 1],
+        delay: 0.25
       },
     },
     exit: {
@@ -445,18 +446,21 @@ export default function Home({
   const pageAnimation = {
     initial: {
       transition: {
-        staggerChildren: (0.05, { from: "last" }),
+        staggerChildren: (0.075, { from: "last" }),
+        ease: [0.12, 0, 0.39, 0],
       },
     },
     enter: {
       transition: {
         staggerChildren: 0.05,
+        ease: [0.12, 0, 0.39, 0],
       },
     },
     exit: {
       transition: {
         duration: 0.5,
         staggerChildren: (0.05, { from: "last" }),
+        ease: [0.12, 0, 0.39, 0],
       },
     },
   };
@@ -577,13 +581,3 @@ export default function Home({
     </Layout>
   );
 }
-
-export const getStaticProps = async () => {
-  const home = await getPropData(getHome);
-
-  return {
-    props: {
-      ...home,
-    },
-  };
-};
