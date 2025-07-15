@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 
-import Monogram from "./Monogram";
+import Monogram from "./icons/Monogram";
 
 export default function Nav() {
     const [time, setTime] = useState(new Date());

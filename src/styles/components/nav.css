@@ -19,7 +19,8 @@
   z-index: 99999;
 
   > * {
-    flex: 1;
+    /* flex: 1; */
+    flex-basis: calc(100% / 3);
   }
 
   .logo {

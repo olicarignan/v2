@@ -1,9 +1,11 @@
 "use client";
 
-import { delay, motion, stagger } from "motion/react";
+import { motion } from "motion/react";
 
 import { getPropData } from "@/utils/propData";
 import { getInfo } from "@/gql/queries.js";
+
+import Montreal from "@/components/icons/Montreal";
 
 import Layout from "@/layouts/Layout";
 import { anim } from "@/utils/animate";
@@ -38,9 +40,9 @@ export default function Info({ info }) {
         ease: [0, 0.55, 0.45, 1],
         when: "beforeChildren",
         staggerChildren: 0.1,
-      }
-    }
-  }
+      },
+    },
+  };
 
   const article = {
     hidden: {
@@ -52,10 +54,8 @@ export default function Info({ info }) {
       opacity: 1,
       y: 0,
       transition: { duration: 0.5, ease: [0, 0.55, 0.45, 1] },
-    }
+    },
   };
-
-
 
   return (
     <Layout>
@@ -75,32 +75,42 @@ export default function Info({ info }) {
           </p>
         </div>
 
-        <motion.div {...anim(line)} className="divider"/>
-        <motion.div variants={body} animate="visible" initial="hidden" className="body">
+        <motion.div {...anim(line)} className="divider" />
+        <motion.div
+          variants={body}
+          animate="visible"
+          initial="hidden"
+          className="body"
+        >
           <motion.article variants={article} className="contact">
-            <h2>Contact</h2>
-            <p>
-              If you would like more information about my practice or want to
-              discuss a project or idea, please get in touch.
-              <br />
-              <br />
-            </p>
-            <div className="links">
-              <span>
-                <a href="mailto:hi@oliviercarignan.com">
-                  hi@oliviercarignan.com
-                </a>
-              </span>
-              <span>
-                <a
-                  href="https://www.instagram.com/olivier_c___/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  @olivier_c___
-                </a>
-              </span>
+            <div className="contact__inner">
+              <h2>Contact</h2>
+              <p>
+                If you would like more information about my practice or want to
+                discuss a project or idea, please get in touch.
+                <br />
+                <br />
+              </p>
+              <div className="links">
+                <span>
+                  <a href="mailto:hi@oliviercarignan.com">
+                    hi@oliviercarignan.com
+                  </a>
+                </span>
+                <span>
+                  <a
+                    href="https://www.instagram.com/olivier_c___/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    @olivier_c___
+                  </a>
+                </span>
+              </div>
             </div>
+            <span className="mtl">
+              <Montreal /> Based in Montreal, Canada
+            </span>
           </motion.article>
 
           <motion.article variants={article} className="services">

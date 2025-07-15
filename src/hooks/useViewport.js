@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useLayoutEffect } from "react";
 
 export const useViewport = () => {
   const [viewportHeight, setViewportHeight] = useState(0);
   const [viewportWidth, setViewportWidth] = useState(0);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const updateViewportDimensions = () => {
       // Use visualViewport if available (better for mobile with dynamic viewport)
       if (window.visualViewport) {

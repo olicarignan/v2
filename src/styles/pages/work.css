@@ -16,7 +16,7 @@
     gap: clamp(0.8rem, 0.5vw, 0.5vw);
     padding: 0 1.6rem 8px 1.6rem;
     will-change: transform;
-    transform: translateZ(0);
+    transform: translate3d(0, 0, 0);
     backface-visibility: hidden;
     transition: transform 0.3s ease-out;
   }

@@ -41,7 +41,7 @@ export default function Layout({ children}) {
       opacity: 1,
     },
     exit: {
-      x: router.pathname === "/" ? 150 : -150,
+      x: router.pathname === "/" ? 150 : -150, // Adjust for different viewport widths
       opacity: 0.5,
       transition: { duration: 1, ease: [0.85, 0, 0.15, 1] },
     }

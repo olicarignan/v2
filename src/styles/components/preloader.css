@@ -1,0 +1,51 @@
+.preloader {
+  --100dvh: calc(var(--vh, 1dvh) * 100);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  z-index: 99999;
+
+  .preloader__inner {
+    grid-column: 2 / -2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    height: var(--100dvh);
+    width: 100%;
+  }
+
+  svg {
+    overflow: visible;
+  }
+
+  svg * {
+    fill: var(--text-color);
+  }
+
+  .monogram {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: fit-content;
+
+    .c {
+      position: absolute;
+      transform: translate(calc(100vw / 2 - 400px), -50%) scale(2);
+    }
+  }
+
+  /* .o {
+  } */
+
+  .monogram--inverted {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: fit-content;
+    opacity: 0;
+  }
+}
