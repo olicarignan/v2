@@ -679,7 +679,7 @@ export default function Home({
 
   const thumbnailAnimation = {
     initial: {
-      y: "calc(100% + 8px)",
+      y: "calc(100% + 10px)",
       opacity: 0.5,
       transition: {
         duration: 0.5,
@@ -697,7 +697,7 @@ export default function Home({
       },
     },
     exit: {
-      y: "calc(100% + 8px)",
+      y: "calc(100% + 10px)",
       opacity: 0.5,
       transition: {
         duration: 0.5,

@@ -29,13 +29,13 @@ export default function Seo() {
         <link rel="icon" href="/images/png/rattle-favicon.png" sizes="32x32" />
         <link
           rel="icon"
-          href="/images/png/favicon-light.png"
+          href="/images/favicon_dark.png"
           type="image/svg+xml"
           media="(prefers-color-scheme: dark)"
         />
         <link
           rel="icon"
-          href="/images/png/favicon-dark.png"
+          href="/images/favicon_light.png"
           type="image/svg+xml"
           media="(prefers-color-scheme: light)"
         />

@@ -8,8 +8,6 @@ import { anim } from "@/utils/animate";
 
 export default function Preloader({ progress, total }) {
 
-  console.log(progress)
-
   const iconAnimation = {
     initial: {
       opacity: 1,

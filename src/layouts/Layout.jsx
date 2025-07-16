@@ -1,3 +1,5 @@
+'use client'
+
 import { motion } from "motion/react";
 import { useRouter } from "next/router";
 
@@ -9,20 +11,20 @@ export default function Layout({ children}) {
   const router = useRouter();
 
   const opacity = {
-    initial: { opacity: 0 },
+    initial: { opacity: 0.5 },
     enter: { opacity: 1,
-      duration: 0.2
+      duration: 0.1
      },
-    exit: { opacity: 1 },
+    exit: { opacity: 0.5 },
   };
 
-  const slide = {
+  const slideInfo = {
     inital: {
-      x: 0,
+      x: "-100vw",
       transition: { type: "tween", duration: 0}
     },
     enter: {
-      x: router.pathname === "/" ? "100vw" : "-100vw",
+      x: "-100vw",
       transition: { type: "tween", duration: 0}
     },
     exit: {
@@ -31,7 +33,22 @@ export default function Layout({ children}) {
     },
   };
 
-  const perspective = {
+  const slideHome = {
+    initial: {
+      x: "-100vw",
+      transition: { type: "tween", duration: 0}
+    },
+    enter: {
+      x: "-100vw",
+      transition: { type: "tween", duration: 0}
+    },
+    exit: {
+      x: "-100vw",
+      transition: { duration: 1, ease: [0.85, 0, 0.15, 1] },
+    },
+  };
+
+  const perspectiveInfo = {
     initial: {
       x: 0,
       opacity: 1,
@@ -41,19 +58,36 @@ export default function Layout({ children}) {
       opacity: 1,
     },
     exit: {
-      x: router.pathname === "/" ? 150 : -150, // Adjust for different viewport widths
+      x: "10vw",
       opacity: 0.5,
       transition: { duration: 1, ease: [0.85, 0, 0.15, 1] },
     }
-
   }
+
+  const perspectiveHome = {
+    initial: {
+      x: 0,
+      opacity: 1,
+    },
+    enter: {
+      x: 0,
+      opacity: 1,
+    },
+    exit: {
+      x: 0,
+      opacity: 0.5,
+      transition: { duration: 1, ease: [0.85, 0, 0.15, 1] },
+    }
+  }
+
+
 
   return (
     <div className="layout">
       <Nav />
-      <motion.div {...anim(slide)} className="slide" />
-      <motion.div {...anim(perspective)}>
-        <motion.div {...anim(opacity)} className="grid">
+      <motion.div {...anim( router.pathname === "/" ? slideInfo : slideHome)} className="slide" />
+      <motion.div {...anim( router.pathname === "/" ? perspectiveInfo : perspectiveHome)}>
+        <motion.div className="grid">
           {children}
         </motion.div>
       </motion.div>

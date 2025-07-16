@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "motion/react";
+import { color, motion } from "motion/react";
 
 import { getPropData } from "@/utils/propData";
 import { getInfo } from "@/gql/queries.js";
@@ -20,12 +20,16 @@ export default function Info({ info }) {
     enter: {
       width: "100%",
       transition: {
-        duration: 0.3,
+        duration: 0.5,
         ease: [0, 0.55, 0.45, 1],
       },
     },
     exit: {
       width: 0,
+      transition: {
+        duration: 0.5,
+        ease: [0, 0.55, 0.45, 1],
+      },
     },
   };
 
@@ -46,14 +50,33 @@ export default function Info({ info }) {
 
   const article = {
     hidden: {
+      filter: "blur(10px)",
       opacity: 0,
       y: "-100%",
-      transition: { duration: 0.5, ease: [0, 0.55, 0.45, 1] },
+      transition: { duration: 0.5, ease: [0.32, 0, 0.67, 0] },
     },
     visible: {
+      filter: "blur(0px)",
       opacity: 1,
       y: 0,
       transition: { duration: 0.5, ease: [0, 0.55, 0.45, 1] },
+    },
+  };
+
+  const hero = {
+    initial: {
+      opacity: 0.5,
+      filter: "blur(10px)",
+    },
+    enter: {
+      opacity: 1,
+      filter: "blur(0px)",
+      transition: { duration: 0.5, ease: [0.32, 0, 0.67, 0] },
+    },
+    exit: {
+      opacity: 0.5,
+      filter: "blur(0px)",
+      transition: { duration: 0.5, ease: [0.32, 0, 0.67, 0] },
     },
   };
 
@@ -61,7 +84,7 @@ export default function Info({ info }) {
     <Layout>
       <main className="info">
         <div className="hero">
-          <p>
+          <motion.p {...anim(hero)}>
             Olivier Carignan
             <sup>
               <span className="serif">{"("}</span>
@@ -72,7 +95,7 @@ export default function Info({ info }) {
             multidisciplinary design practice. I partner with studios, brands
             and individuals worldwide to build thoughtful, expressive digital
             experiences at the intersection of design, technology, and culture.
-          </p>
+          </motion.p>
         </div>
 
         <motion.div {...anim(line)} className="divider" />
