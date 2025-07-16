@@ -50,6 +50,7 @@ export default function Home({
   const snapTimeoutRef = useRef(null);
   const currentScrollOffsetRef = useRef(0); // Track current offset for momentum
   const featuredRef = useRef(null);
+  const featuredWrapperRef = useRef(null);
 
   // Custom hooks
   const { viewportHeight, viewportWidth } = useViewport();
@@ -572,14 +573,14 @@ export default function Home({
 
       // Disable transition temporarily for immediate positioning
       if (thumbnailGridRef.current) {
-        const hadTransition =
-          thumbnailGridRef.current.style.transition !== "none";
+        const hadTransition = thumbnailGridRef.current.style.transition !== "none";
         thumbnailGridRef.current.style.transition = "none";
+        featuredWrapperRef.current.style.transition = "none";
 
         setTimeout(() => {
           if (thumbnailGridRef.current && hadTransition && !isTouchDevice) {
-            thumbnailGridRef.current.style.transition =
-              "transform 0.3s ease-out";
+            thumbnailGridRef.current.style.transition = "transform 0.3s ease-out";
+            featuredWrapperRef.current.style.transition = "transform 0.3s ease-out";
           }
         }, 50);
       }
@@ -633,7 +634,7 @@ export default function Home({
   const featuredImage = {
     initial: {
       opacity: 0.25,
-      x: "-100%"
+      x: "-100%",
     },
     enter: {
       opacity: 1,
@@ -642,7 +643,7 @@ export default function Home({
         type: "tween",
         duration: 0.75,
         ease: [0, 0.55, 0.45, 1],
-        delay: 0.25
+        delay: 0.25,
       },
     },
     exit: {
@@ -651,7 +652,7 @@ export default function Home({
       transition: {
         duration: 0.5,
         type: "tween",
-      }
+      },
     },
   };
 
@@ -671,7 +672,7 @@ export default function Home({
     exit: {
       transition: {
         duration: 0.5,
-        staggerChildren: (0.025),
+        staggerChildren: 0.025,
         ease: [0.12, 0, 0.39, 0],
       },
     },
@@ -712,6 +713,7 @@ export default function Home({
       <main className="work">
         <div className="scroll-container">
           <motion.div
+            ref={thumbnailGridRef}
             variants={pageAnimation}
             style={{
               gap: `${dynamicGap}px`,
@@ -722,6 +724,7 @@ export default function Home({
           >
             <div
               className="featured"
+              ref={featuredWrapperRef}
               style={{
                 transform: `translateX(${-scrollOffset}px)`,
                 transition: isTouchDevice ? "none" : undefined,

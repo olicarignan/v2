@@ -12,6 +12,7 @@ import { Analytics } from "@vercel/analytics/next";
 export default function App({ Component, pageProps, router }) {
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState("00");
+  const [total, setTotal] = useState("19");
 
   const { data } = useSWR(getHome, (query) => fetcher(query));
 
@@ -21,6 +22,7 @@ export default function App({ Component, pageProps, router }) {
   useEffect(() => {
     if (!images) return;
 
+    setTotal(images.length);
     usePreloader(images, setProgress).then(() => {
       setTimeout(() => {
         setLoading(false); // Hide immediately when done
@@ -33,7 +35,7 @@ export default function App({ Component, pageProps, router }) {
       <Seo />
       <AnimatePresence mode="wait" initial="false">
         {loading ? (
-          <Preloader progress={progress} total={images?.length} />
+          <Preloader progress={progress} total={total} />
         ) : (
           <Component key={router.route} {...pageProps} home={data.home} />
         )}

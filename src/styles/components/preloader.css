@@ -20,7 +20,6 @@
   .total {
     height: var(--100dvh);
     display: flex;
-    align-items: end;
 
     span {
       font-size: clamp(6rem, 18vw, 18vw);

@@ -22,13 +22,28 @@ export default function Preloader({ progress, total }) {
     },
   };
 
+  const slideOut = {
+    initial: {
+      y: 0,
+      transition: { type: "tween", duration: 0}
+    },
+    enter: {
+      y: 0,
+      transition: { type: "tween", duration: 0}
+    },
+    exit: {
+      y: "-100%",
+      transition: { duration: 1, ease: [0.85, 0, 0.15, 1] },
+    },
+  }
+
   return (
-    <motion.div className="preloader grid">
+    <motion.div {...anim(slideOut)} className="preloader grid">
       <div className="progress">
         <span suppressHydrationWarning>{progress}</span>
       </div>
       <div className="total">
-        <span>{total}</span>
+        <span suppressHydrationWarning>{total}</span>
       </div>
     </motion.div>
   );

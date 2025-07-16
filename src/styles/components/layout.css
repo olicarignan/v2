@@ -1,6 +1,6 @@
 .layout {
-  --100dvh: calc(var(--vh, 1dvh) * 100);
   position: relative;
+  --100dvh: calc(var(--vh, 1dvh) * 100);
 
   .slide {
     background-color: var(--background-color);
@@ -12,5 +12,8 @@
     z-index: 3;
     will-change: transform;
     transition: none;
+  }
+
+  @media (min-width: 768px) {
   }
 }

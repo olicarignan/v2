@@ -6,7 +6,12 @@
   grid-column: 2 / -2;
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+
+  .info__wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
 
   .hero {
     padding: var(--hero-padding);
@@ -98,6 +103,10 @@
     --hero-padding: 6vw 0;
     --h2-margin: 2rem;
     --contact-order: 0;
+    --100dvh: calc(var(--vh, 1dvh) * 100);
+
+    height: var(--100dvh);
+    justify-content: space-between;
 
     .hero {
       text-align: center;
@@ -119,6 +128,12 @@
 
     .clients {
       grid-column: 10 / span 3;
+    }
+
+    .copyright {
+      width: 100%;
+      text-align: center;
+      font-weight: 300;
     }
   }
 }

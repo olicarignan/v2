@@ -10,14 +10,6 @@ export default function Layout({ children}) {
 
   const router = useRouter();
 
-  const opacity = {
-    initial: { opacity: 0.5 },
-    enter: { opacity: 1,
-      duration: 0.1
-     },
-    exit: { opacity: 0.5 },
-  };
-
   const slideInfo = {
     inital: {
       x: "-100vw",
@@ -29,7 +21,7 @@ export default function Layout({ children}) {
     },
     exit: {
       x: 0,
-      transition: { duration: 1, ease: [0.85, 0, 0.15, 1] },
+      transition: { duration: 0.5, ease: [0.85, 0, 0.15, 1] },
     },
   };
 
@@ -85,6 +77,7 @@ export default function Layout({ children}) {
   return (
     <div className="layout">
       <Nav />
+      <motion.div className="slide--loader" />
       <motion.div {...anim( router.pathname === "/" ? slideInfo : slideHome)} className="slide" />
       <motion.div {...anim( router.pathname === "/" ? perspectiveInfo : perspectiveHome)}>
         <motion.div className="grid">
