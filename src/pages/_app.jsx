@@ -30,7 +30,7 @@ export default function App({ Component, pageProps, router }) {
 
   return (
     <>
-      <Seo keywords />
+      <Seo />
       <AnimatePresence mode="wait" initial="false">
         {loading ? (
           <Preloader progress={progress} total={images?.length} />

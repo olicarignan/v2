@@ -1,6 +1,6 @@
 import Head from "next/head";
 
-export default function Seo({ keywords }) {
+export default function Seo() {
   return (
     <>
       <Head>
@@ -85,7 +85,7 @@ export default function Seo({ keywords }) {
         <meta property="og:image:height" content="630" />
         <meta property="og:image:alt" content="Olivier Carignan logo" />
         <meta property="og:site_name" content="Olivier Carignan" />
-        <meta property="og:url" content={url} />
+        <meta property="og:url" content="https://oliviercarignan.com" />
         <meta property="og:logo" content="/images/og-image--light.png" />
 
         {/* START TWITTER META */}
