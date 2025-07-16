@@ -87,7 +87,7 @@ export default function Home({
     const min =
       generatedThumbnailWidths.length === 0
         ? 0
-        : -(thumbnailPositions[thumbnailPositions.length - 1] + 16) + 16;
+        : -(thumbnailPositions[thumbnailPositions.length - 1] + 16);
     return { minOffset: min, maxOffset: max };
   }, [thumbnailPositions, generatedThumbnailWidths.length]);
 
