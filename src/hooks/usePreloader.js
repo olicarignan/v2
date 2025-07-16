@@ -8,8 +8,7 @@ export const usePreloader = async (images, onProgress) => {
       const img = new Image()
       img.onload = img.onerror = () => {
         loaded++
-        // onProgress(String(loaded).padStart(2, "0"));
-        onProgress(Math.floor(loaded / total * 100))
+        onProgress(loaded.toString().padStart(2, "0"));
         resolve()
       }
       img.src = src

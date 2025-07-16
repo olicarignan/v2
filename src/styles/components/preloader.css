@@ -16,36 +16,32 @@
     width: 100%;
   }
 
-  svg {
-    overflow: visible;
-  }
+  .progress,
+  .total {
+    height: var(--100dvh);
+    display: flex;
+    align-items: end;
 
-  svg * {
-    fill: var(--text-color);
-  }
-
-  .monogram {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: fit-content;
-
-    .c {
-      position: absolute;
-      transform: translate(calc(100vw / 2 - 400px), -50%) scale(2);
+    span {
+      font-size: clamp(6rem, 18vw, 18vw);
     }
   }
 
-  /* .o {
-  } */
+  .progress {
+    grid-column: 2 / span 3;
+  }
 
-  .monogram--inverted {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: fit-content;
-    opacity: 0;
+  .total {
+    grid-column: 5 / span 3;
+  }
+
+  @media (min-width: 768px) {
+    .progress {
+      grid-column: 2 / span 6;
+    }
+
+    .total {
+      grid-column: 8 / span 6;
+    }
   }
 }

@@ -20,9 +20,6 @@ export default function Monogram(fill) {
     enter: {
       opacity: 1,
       x: 0,
-      transition: {
-        duration: 5,
-      },
     },
     exit: {
       opacity: 0,
@@ -41,9 +38,6 @@ export default function Monogram(fill) {
       opacity: 1,
       x: 0,
       scale: 1,
-      transition: {
-        duration: 5,
-      },
     },
     exit: {
       opacity: 0,
@@ -59,10 +53,8 @@ export default function Monogram(fill) {
     },
     enter: {
       opacity: 0,
-      filter: "blur(20px)",
+      filter: "blur(0px)",
       transition: {
-        duration: 5,
-        delay: 5,
         when: "afterChildren",
       },
     },

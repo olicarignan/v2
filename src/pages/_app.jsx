@@ -9,7 +9,7 @@ import { getHome } from "@/gql/queries.js";
 
 export default function App({ Component, pageProps, router }) {
   const [loading, setLoading] = useState(true);
-  const [progress, setProgress] = useState(0);
+  const [progress, setProgress] = useState("00");
 
   const { data } = useSWR(getHome, (query) => fetcher(query));
 
@@ -26,13 +26,13 @@ export default function App({ Component, pageProps, router }) {
     });
   }, [images]);
 
-  if (loading) {
-    return <Preloader progress={progress} total={images?.length} />;
-  }
-
   return (
     <AnimatePresence mode="wait" initial="false">
-      <Component key={router.route} {...pageProps} home={data.home} />
+      {loading ? (
+        <Preloader progress={progress} total={images?.length} />
+      ) : (
+        <Component key={router.route} {...pageProps} home={data.home} />
+      )}
     </AnimatePresence>
   );
 }

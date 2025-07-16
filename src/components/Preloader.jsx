@@ -6,10 +6,7 @@ import MonogramInverted from "@/components/icons/MonogramInverted";
 import Monogram from "@/components/icons/Monogram";
 import { anim } from "@/utils/animate";
 
-export default function Preloader({
-  progress,
-  total
-}) {
+export default function Preloader({ progress, total }) {
 
   console.log(progress)
 
@@ -28,23 +25,13 @@ export default function Preloader({
   };
 
   return (
-    <div className="preloader grid">
-      <div className="preloader__inner">
-        {/* <motion.div {...anim(OAnimation)} className="icon o">
-          <O />
-        </motion.div>
-        <motion.div {...anim(CAnimation)} className="icon c">
-          <C />
-        </motion.div> */}
-
-        <motion.div {...anim(iconAnimation)} className="icon monogram">
-          <Monogram />
-        </motion.div>
-
-        <motion.div className="icon monogram--inverted">
-          <MonogramInverted />
-        </motion.div>
+    <motion.div className="preloader grid">
+      <div className="progress">
+        <span suppressHydrationWarning>{progress}</span>
       </div>
-    </div>
+      <div className="total">
+        <span>{total}</span>
+      </div>
+    </motion.div>
   );
 }

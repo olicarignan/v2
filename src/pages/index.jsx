@@ -714,7 +714,6 @@ export default function Home({
           <motion.div
             variants={pageAnimation}
             style={{
-              transform: `translateX(${scrollOffset}px)`,
               gap: `${dynamicGap}px`,
               transition: isTouchDevice ? "none" : "transform 0.3s ease-out",
               transform: `translate3d(${scrollOffset}px, 0, 0)`,

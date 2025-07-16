@@ -1,6 +1,4 @@
 .nav {
-  --min-font-size: 1.4rem;
-  --max-font-size: 1.6rem;
   --menu-gap: 1.2rem;
   --padding: 1.2rem;
 
@@ -33,13 +31,8 @@
   }
 
   .monogram {
-    width: clamp(var(--min-font-size), 1.5vw, var(--max-font-size));
-    height: clamp(var(--min-font-size), 1.5vw, var(--max-font-size));
+    font-size: 1.8rem;
     position: relative;
-
-    svg {
-      fill: var(--text-color);
-    }
   }
 
   .wordmark {

@@ -4,8 +4,6 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 
-import Monogram from "./icons/Monogram";
-
 export default function Nav() {
     const [time, setTime] = useState(new Date());
     const router = useRouter();
@@ -26,9 +24,7 @@ export default function Nav() {
     <nav className="nav">
       <div>
         <Link className="logo" href="/">
-          <div className="monogram">
-            <Monogram />
-          </div>
+          <div className="monogram">©</div>
           <span className="wordmark">Olivier Carignan</span>
         </Link>
       </div>
