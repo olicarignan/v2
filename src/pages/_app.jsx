@@ -6,6 +6,7 @@ import Preloader from "@/components/Preloader";
 import useSWR from "swr";
 import { fetcher } from "@/utils/propData";
 import { getHome } from "@/gql/queries.js";
+import { Analytics } from "@vercel/analytics/next";
 
 export default function App({ Component, pageProps, router }) {
   const [loading, setLoading] = useState(true);
@@ -27,12 +28,15 @@ export default function App({ Component, pageProps, router }) {
   }, [images]);
 
   return (
-    <AnimatePresence mode="wait" initial="false">
-      {loading ? (
-        <Preloader progress={progress} total={images?.length} />
-      ) : (
-        <Component key={router.route} {...pageProps} home={data.home} />
-      )}
-    </AnimatePresence>
+    <>
+      <AnimatePresence mode="wait" initial="false">
+        {loading ? (
+          <Preloader progress={progress} total={images?.length} />
+        ) : (
+          <Component key={router.route} {...pageProps} home={data.home} />
+        )}
+      </AnimatePresence>
+      <Analytics />
+    </>
   );
 }
