@@ -13,7 +13,7 @@ export default function Seo({ keywords }) {
         <meta name="googlebot" content="index,follow" />
         <meta
           name="keywords"
-          content={keywords && keywords.length ? keywords.join(",") : keywords}
+          content="Digital Design, Art Direction, Branding & Identity, Interaction Design, Research & Strategy, Product Design, Experimental Development"
         />
         <meta name="author" content="Olivier Carignan" />
         <meta name="referrer" content="no-referrer" />
@@ -39,8 +39,18 @@ export default function Seo({ keywords }) {
           type="image/svg+xml"
           media="(prefers-color-scheme: light)"
         />
-        <link rel="icon" type="image/png" href="/images/favicon_light.png" media="(prefers-color-scheme: light)" />
-        <link rel="icon" type="image/png" href="/images/favicon_dark.png" media="(prefers-color-scheme: dark)" />
+        <link
+          rel="icon"
+          type="image/png"
+          href="/images/favicon_light.png"
+          media="(prefers-color-scheme: light)"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          href="/images/favicon_dark.png"
+          media="(prefers-color-scheme: dark)"
+        />
         <link
           rel="mask-icon"
           href="/images/apple_touch--light.png"
@@ -70,28 +80,13 @@ export default function Seo({ keywords }) {
         />
         <meta property="og:type" content="website" />
         <meta property="og:locale" content="en_CA" />
-        <meta
-          property="og:image"
-          content="/images/og-image--light.png"
-        />
-        <meta
-          property="og:image:width"
-          content="630"
-        />
-        <meta
-          property="og:image:height"
-          content="630"
-        />
-        <meta
-          property="og:image:alt"
-          content="Olivier Carignan logo"
-        />
+        <meta property="og:image" content="/images/og-image--light.png" />
+        <meta property="og:image:width" content="630" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="Olivier Carignan logo" />
         <meta property="og:site_name" content="Olivier Carignan" />
         <meta property="og:url" content={url} />
-        <meta
-          property="og:logo"
-          content="/images/og-image--light.png"
-        />
+        <meta property="og:logo" content="/images/og-image--light.png" />
 
         {/* START TWITTER META */}
         <meta name="twitter:card" content="summary_large_image" />
@@ -102,10 +97,7 @@ export default function Seo({ keywords }) {
           name="twitter:description"
           content="Multidisciplinary Designer & Engineer"
         />
-        <meta
-          name="twitter:image"
-          content="/images/og-image--light.png"
-        />
+        <meta name="twitter:image" content="/images/og-image--light.png" />
         {/* END TWITTER META */}
       </Head>
     </>

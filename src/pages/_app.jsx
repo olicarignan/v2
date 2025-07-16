@@ -6,6 +6,7 @@ import Preloader from "@/components/Preloader";
 import useSWR from "swr";
 import { fetcher } from "@/utils/propData";
 import { getHome } from "@/gql/queries.js";
+import Seo from "@/components/Seo";
 import { Analytics } from "@vercel/analytics/next";
 
 export default function App({ Component, pageProps, router }) {
@@ -29,6 +30,7 @@ export default function App({ Component, pageProps, router }) {
 
   return (
     <>
+      <Seo keywords />
       <AnimatePresence mode="wait" initial="false">
         {loading ? (
           <Preloader progress={progress} total={images?.length} />
