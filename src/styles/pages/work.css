@@ -14,7 +14,7 @@
     flex-direction: row;
     align-items: flex-end;
     gap: clamp(0.8rem, 0.5vw, 0.5vw);
-    padding: 0 1.6rem 8px 1.6rem;
+    padding: 0 1.6rem 1.6rem 1.6rem;
     will-change: transform;
     transform: translate3d(0, 0, 0);
     backface-visibility: hidden;
@@ -48,7 +48,7 @@
 
   .featured {
     position: fixed;
-    bottom: calc(2.8rem + 12dvh);
+    bottom: calc(3.2rem + 12dvh);
     height: 100%;
     max-height: calc(var(--100dvh) - 8.8rem - 12dvh);
     left: 1.6rem;
@@ -57,7 +57,7 @@
     display: flex;
     align-items: end;
     will-change: transform;
-    transform: translateZ(0);
+    transform: translate3d(0, 0, 0);
     backface-visibility: hidden;
     transition: transform 0.3s ease-out;
     overflow: hidden;
