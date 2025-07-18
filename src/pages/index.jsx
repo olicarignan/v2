@@ -78,12 +78,29 @@ export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
     return calculateTotalWidth(thumbnailPositions, generatedThumbnailWidths);
   }, [thumbnailPositions, generatedThumbnailWidths]);
 
+  // Touch device detection
+  useEffect(() => {
+    const checkTouchDevice = () => {
+      setIsTouchDevice(
+        "ontouchstart" in window || navigator.maxTouchPoints > 0
+      );
+    };
+    checkTouchDevice();
+    window.addEventListener("resize", checkTouchDevice);
+    return () => window.removeEventListener("resize", checkTouchDevice);
+  }, []);
+
+  // Dynamic left padding - 8px on mobile, 16px on desktop
+  const leftPadding = useMemo(() => {
+    return isTouchDevice ? 8 : 16;
+  }, [isTouchDevice]);
+
   const { minOffset, maxOffset } = useMemo(() => {
     const max = 0;
     const min =
       generatedThumbnailWidths.length === 0
         ? 0
-        : -(thumbnailPositions[thumbnailPositions.length - 1] + 16);
+        : -(thumbnailPositions[thumbnailPositions.length - 1] + leftPadding);
     return { minOffset: min, maxOffset: max };
   }, [thumbnailPositions, generatedThumbnailWidths.length]);
 
@@ -136,7 +153,7 @@ export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
       if (!thumbnail) return;
 
       const thumbnailRect = thumbnail.getBoundingClientRect();
-      const targetPosition = 16;
+      const targetPosition = leftPadding;
       const distance = Math.abs(thumbnailRect.left - targetPosition);
 
       if (distance < closestDistance) {
@@ -148,7 +165,7 @@ export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
     if (activeIndex < projectList.length) {
       setActiveThumbnail(activeIndex);
     }
-  }, [isKeyboardNavigating, projectList.length]);
+  }, [isKeyboardNavigating, projectList.length, leftPadding]);
 
   // Snap to position function
   const snapToPosition = useCallback(() => {
@@ -158,7 +175,7 @@ export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
     if (!activeThumb) return;
 
     const thumbRect = activeThumb.getBoundingClientRect();
-    const targetPosition = 16;
+    const targetPosition = leftPadding;
     const currentPosition = thumbRect.left;
     const snapDistance = targetPosition - currentPosition;
 
@@ -222,6 +239,7 @@ export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
     isTouchDevice,
     updateActiveThumbnailFromOffset,
     isSafari,
+    leftPadding,
   ]);
 
   // Single RAF loop for momentum
@@ -274,18 +292,6 @@ export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
     isTouchDevice,
     isSafari,
   ]);
-
-  // Touch device detection
-  useEffect(() => {
-    const checkTouchDevice = () => {
-      setIsTouchDevice(
-        "ontouchstart" in window || navigator.maxTouchPoints > 0
-      );
-    };
-    checkTouchDevice();
-    window.addEventListener("resize", checkTouchDevice);
-    return () => window.removeEventListener("resize", checkTouchDevice);
-  }, []);
 
   // Wheel handler - Safari optimized
   useEffect(() => {
