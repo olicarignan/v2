@@ -433,11 +433,14 @@ export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
       dragStateRef.current.isDragging = false;
       setIsDragging(false);
 
-      // Skip momentum calculation on Safari but keep snapping
-      if (isSafari) {
-        setTimeout(snapToPosition, 100); // Shorter delay for Safari
+      // Calculate momentum for all mobile devices, but skip for Safari desktop only
+      const isSafariDesktop = isSafari && !isTouchDevice;
+
+      if (isSafariDesktop) {
+        // Safari Desktop: Skip momentum, just snap
+        setTimeout(snapToPosition, 100);
       } else {
-        // Only calculate momentum for non-Safari browsers
+        // Mobile (all browsers) and non-Safari desktop: Calculate momentum
         let finalVelocity = 0;
 
         if (dragStateRef.current.velocityHistory.length > 0) {
