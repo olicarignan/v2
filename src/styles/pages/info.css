@@ -17,6 +17,7 @@
     padding: var(--hero-padding);
     font-family: var(--font-serif);
     font-size: clamp(2.8rem, 3.17vw, 3.17vw);
+    font-weight: 300;
   }
 
   .sans {

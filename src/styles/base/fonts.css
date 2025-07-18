@@ -14,10 +14,50 @@
 @font-face {
   font-family: t;
   font-style: normal;
-  font-weight: 100 900;
+  font-weight: 200;
   font-display: swap;
-  src: url("../../../public/fonts/TimesNow/Jha\ Times\ Now.woff2")
-    format("woff2");
+  src: url("../../../public/fonts/TimesNow/TimesNow-Light.woff2")
+      format("woff2"),
+    url("../../../public/fonts/TimesNow/TimesNow-Light.woff") format("woff"),
+    url("../../../public/fonts/TimesNow/TimesNow-Light.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: t;
+  font-style: italic;
+  font-weight: 200;
+  font-display: swap;
+  src: url("../../../public/fonts/TimesNow/TimesNow-LightItalic.woff2")
+      format("woff2"),
+    url("../../../public/fonts/TimesNow/TimesNow-LightItalic.woff")
+      format("woff"),
+    url("../../../public/fonts/TimesNow/TimesNow-LightItalic.ttf")
+      format("truetype");
+}
+
+@font-face {
+  font-family: t;
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url("../../../public/fonts/TimesNow/TimesNow-SemiLight.woff2")
+      format("woff2"),
+    url("../../../public/fonts/TimesNow/TimesNow-SemiLight.woff") format("woff"),
+    url("../../../public/fonts/TimesNow/TimesNow-SemiLight.ttf")
+      format("truetype");
+}
+
+@font-face {
+  font-family: t;
+  font-style: italic;
+  font-weight: 300;
+  font-display: swap;
+  src: url("../../../public/fonts/TimesNow/TimesNow-SemiLightItalic.woff2")
+      format("woff2"),
+    url("../../../public/fonts/TimesNow/TimesNow-SemiLightItalic.woff")
+      format("woff"),
+    url("../../../public/fonts/TimesNow/TimesNow-SemiLightItalic.ttf")
+      format("truetype");
 }
 
 :root {
