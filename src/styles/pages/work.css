@@ -102,17 +102,12 @@
 
   @media (min-width: 768px) {
     .work__container {
-      padding: 0 16rem 8rem 16rem;
+      padding: 0 1.6rem 1.6rem 1.6rem;
     }
 
     .featured {
-      left: 3.2rem;
-      width: calc(100vw - 6.4rem);
-    }
-
-    .carousel {
-      transform: translateX(-3.2rem);
-      padding: 0 3.2rem;
+      left: 1.6rem;
+      width: calc(100vw - 3.2rem);
     }
   }
 }
