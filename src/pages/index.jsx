@@ -1,13 +1,7 @@
 "use client";
 
-import {
-  useRef,
-  useState,
-  useEffect,
-  useMemo,
-  useCallback,
-} from "react";
-import { motion }  from "motion/react"
+import { useRef, useState, useEffect, useMemo, useCallback } from "react";
+import { motion } from "motion/react";
 
 import { useViewport } from "@/hooks/useViewport";
 
@@ -20,11 +14,7 @@ import {
 import { anim } from "@/utils/animate";
 import Layout from "@/layouts/Layout";
 
-export default function Home({
-  home,
-  thumbnailHeightVh = 12,
-  projects = [],
-}) {
+export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
   const [scrollOffset, setScrollOffset] = useState(0);
   const [activeThumbnail, setActiveThumbnail] = useState(0);
   const [currentPage, setCurrentPage] = useState("WORK");
@@ -32,11 +22,11 @@ export default function Home({
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [isKeyboardNavigating, setIsKeyboardNavigating] = useState(false);
+  const [isSafari, setIsSafari] = useState(false);
 
   // Refs
   const thumbnailRefs = useRef([]);
   const thumbnailGridRef = useRef(null);
-  const cursorRef = useRef(null);
   const animationFrameRef = useRef(null);
   const momentumRef = useRef(0);
   const dragStateRef = useRef({
@@ -46,13 +36,19 @@ export default function Home({
     lastX: 0,
     lastTime: 0,
   });
-  const lastScrollTimeRef = useRef(0);
   const snapTimeoutRef = useRef(null);
-  const currentScrollOffsetRef = useRef(0); // Track current offset for momentum
+  const currentScrollOffsetRef = useRef(0);
   const featuredRef = useRef(null);
+  const cursorRef = useRef(null);
 
   // Custom hooks
   const { viewportHeight, viewportWidth } = useViewport();
+
+  // Detect Safari
+  useEffect(() => {
+    const userAgent = navigator.userAgent.toLowerCase();
+    setIsSafari(userAgent.includes("safari") && !userAgent.includes("chrome"));
+  }, []);
 
   // Memoized calculations
   const thumbnailHeight = useMemo(() => {
@@ -95,11 +91,12 @@ export default function Home({
   const updateScrollTransform = useCallback((offset) => {
     if (thumbnailGridRef.current) {
       thumbnailGridRef.current.style.transform = `translate3d(${offset}px, 0, 0)`;
+      featuredRef.current.style.transform = `translate3d(${-offset}px, 0, 0)`;
     }
-    currentScrollOffsetRef.current = offset; // Keep ref in sync
+    currentScrollOffsetRef.current = offset;
   }, []);
 
-  // Active thumbnail detection based on scroll offset (not DOM position)
+  // Active thumbnail detection based on scroll offset
   const updateActiveThumbnailFromOffset = useCallback(
     (offset) => {
       if (
@@ -128,7 +125,7 @@ export default function Home({
     [isKeyboardNavigating, projectList.length, thumbnailPositions]
   );
 
-  // Active thumbnail detection based on DOM position (for final alignment check)
+  // Active thumbnail detection based on DOM position
   const updateActiveThumbnailFromDOM = useCallback(() => {
     if (isKeyboardNavigating || projectList.length === 0) return;
 
@@ -139,7 +136,7 @@ export default function Home({
       if (!thumbnail) return;
 
       const thumbnailRect = thumbnail.getBoundingClientRect();
-      const targetPosition = 16; // 16px from left side of viewport
+      const targetPosition = 16;
       const distance = Math.abs(thumbnailRect.left - targetPosition);
 
       if (distance < closestDistance) {
@@ -161,44 +158,59 @@ export default function Home({
     if (!activeThumb) return;
 
     const thumbRect = activeThumb.getBoundingClientRect();
-    const targetPosition = 16; // 16px from left edge
+    const targetPosition = 16;
     const currentPosition = thumbRect.left;
     const snapDistance = targetPosition - currentPosition;
 
-    // More sensitive snapping on mobile (1px threshold vs 2px)
     const snapThreshold = isTouchDevice ? 1 : 2;
     if (Math.abs(snapDistance) > snapThreshold) {
       const requiredOffset = currentScrollOffsetRef.current + snapDistance;
       const clampedOffset = clampOffset(requiredOffset, minOffset, maxOffset);
 
-      // Faster snap animation on mobile
-      const duration = isTouchDevice ? 200 : 300;
-      const startOffset = currentScrollOffsetRef.current;
-      const startTime = performance.now();
-
-      const animateSnap = (currentTime) => {
-        const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-
-        // Slightly different easing for mobile (more responsive)
-        const easeOut = isTouchDevice
-          ? 1 - Math.pow(1 - progress, 2.5) // Slightly less aggressive easing
-          : 1 - Math.pow(1 - progress, 3);
-
-        const currentSnapOffset =
-          startOffset + (clampedOffset - startOffset) * easeOut;
-        setScrollOffset(currentSnapOffset);
-        updateScrollTransform(currentSnapOffset);
-
-        // Update active thumbnail during snap animation
-        updateActiveThumbnailFromOffset(currentSnapOffset);
-
-        if (progress < 1) {
-          requestAnimationFrame(animateSnap);
+      if (isSafari) {
+        // Safari: Enable transition only for snapping
+        if (thumbnailGridRef.current) {
+          thumbnailGridRef.current.style.transition = "transform 0.3s ease-out";
+          featuredRef.current.style.transition = "transform 0.3s ease-out";
         }
-      };
 
-      requestAnimationFrame(animateSnap);
+        setScrollOffset(clampedOffset);
+        updateScrollTransform(clampedOffset);
+        updateActiveThumbnailFromOffset(clampedOffset);
+
+        // Disable transition after snap completes
+        setTimeout(() => {
+          if (thumbnailGridRef.current) {
+            thumbnailGridRef.current.style.transition = "none";
+            featuredRef.current.style.transition = "none";
+          }
+        }, 300); // Match transition duration
+      } else {
+        const duration = isTouchDevice ? 200 : 300;
+        const startOffset = currentScrollOffsetRef.current;
+        const startTime = performance.now();
+
+        const animateSnap = (currentTime) => {
+          const elapsed = currentTime - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+
+          const easeOut = isTouchDevice
+            ? 1 - Math.pow(1 - progress, 2.5)
+            : 1 - Math.pow(1 - progress, 3);
+
+          const currentSnapOffset =
+            startOffset + (clampedOffset - startOffset) * easeOut;
+          setScrollOffset(currentSnapOffset);
+          updateScrollTransform(currentSnapOffset);
+          updateActiveThumbnailFromOffset(currentSnapOffset);
+
+          if (progress < 1) {
+            requestAnimationFrame(animateSnap);
+          }
+        };
+
+        requestAnimationFrame(animateSnap);
+      }
     }
   }, [
     activeThumbnail,
@@ -209,22 +221,21 @@ export default function Home({
     isKeyboardNavigating,
     isTouchDevice,
     updateActiveThumbnailFromOffset,
+    isSafari,
   ]);
 
-  // Single RAF loop for all animations with improved active element tracking
+  // Single RAF loop for momentum
   const startAnimationLoop = useCallback(() => {
     if (animationFrameRef.current) return;
 
     const animate = () => {
       let needsUpdate = false;
 
-      // Apply momentum with mobile-friendly decay
       if (
         Math.abs(momentumRef.current) > 0.1 &&
         !dragStateRef.current.isDragging
       ) {
-        // Different decay rates for touch vs non-touch devices
-        const decayRate = isTouchDevice ? 0.92 : 0.95; // Slower decay on mobile for longer momentum
+        const decayRate = isTouchDevice ? 0.92 : 0.95;
         momentumRef.current *= decayRate;
 
         const newOffset = clampOffset(
@@ -235,17 +246,13 @@ export default function Home({
 
         setScrollOffset(newOffset);
         updateScrollTransform(newOffset);
-
-        // Update active thumbnail immediately during momentum
         updateActiveThumbnailFromOffset(newOffset);
 
         needsUpdate = true;
 
-        // Lower threshold for mobile to allow longer momentum
         const stopThreshold = isTouchDevice ? 0.05 : 0.1;
         if (Math.abs(momentumRef.current) < stopThreshold) {
           momentumRef.current = 0;
-          // Trigger snap after momentum stops (shorter delay on mobile)
           setTimeout(snapToPosition, isTouchDevice ? 100 : 200);
         }
       }
@@ -265,6 +272,7 @@ export default function Home({
     updateActiveThumbnailFromOffset,
     snapToPosition,
     isTouchDevice,
+    isSafari,
   ]);
 
   // Touch device detection
@@ -279,42 +287,65 @@ export default function Home({
     return () => window.removeEventListener("resize", checkTouchDevice);
   }, []);
 
-  // Optimized wheel handler
+  // Wheel handler - Safari optimized
   useEffect(() => {
     if (projectList.length === 0) return;
-
-    let ticking = false;
 
     const handleWheel = (e) => {
       e.preventDefault();
       setIsKeyboardNavigating(false);
 
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          const scrollDelta = e.deltaY + e.deltaX;
-          momentumRef.current = 0; // Reset momentum on wheel
+      if (isSafari) {
+        // Safari Desktop: Ultra-simple direct scrolling
+        const scrollDelta = e.deltaY + e.deltaX;
+        const newOffset = clampOffset(
+          currentScrollOffsetRef.current - scrollDelta * 0.7,
+          minOffset,
+          maxOffset
+        );
 
-          const newOffset = clampOffset(
-            currentScrollOffsetRef.current - scrollDelta * 0.5,
-            minOffset,
-            maxOffset
-          );
+        // Disable CSS transitions on Safari
+        if (thumbnailGridRef.current) {
+          featuredRef.current.style.transition = "none";
+          thumbnailGridRef.current.style.transition = "none";
+        }
 
-          setScrollOffset(newOffset);
-          updateScrollTransform(newOffset);
+        // Direct DOM update only - no React state updates
+        updateScrollTransform(newOffset);
+        updateActiveThumbnailFromOffset(newOffset);
 
-          // Update active thumbnail immediately
-          updateActiveThumbnailFromOffset(newOffset);
+        // Add snap timeout for Safari
+        if (snapTimeoutRef.current) {
+          clearTimeout(snapTimeoutRef.current);
+        }
+        snapTimeoutRef.current = setTimeout(snapToPosition, 150);
+      } else {
+        // Other browsers: Use RAF
+        let ticking = false;
+        if (!ticking) {
+          requestAnimationFrame(() => {
+            const scrollDelta = e.deltaY + e.deltaX;
+            momentumRef.current = 0;
 
-          // Clear any existing snap timeout and set a new one
-          if (snapTimeoutRef.current) {
-            clearTimeout(snapTimeoutRef.current);
-          }
-          snapTimeoutRef.current = setTimeout(snapToPosition, 200);
+            const newOffset = clampOffset(
+              currentScrollOffsetRef.current - scrollDelta * 0.9,
+              minOffset,
+              maxOffset
+            );
 
-          ticking = false;
-        });
-        ticking = true;
+            setScrollOffset(newOffset);
+            updateScrollTransform(newOffset);
+            updateActiveThumbnailFromOffset(newOffset);
+
+            if (snapTimeoutRef.current) {
+              clearTimeout(snapTimeoutRef.current);
+            }
+            snapTimeoutRef.current = setTimeout(snapToPosition, 200);
+
+            ticking = false;
+          });
+          ticking = true;
+        }
       }
     };
 
@@ -327,9 +358,10 @@ export default function Home({
     updateScrollTransform,
     snapToPosition,
     updateActiveThumbnailFromOffset,
+    isSafari,
   ]);
 
-  // Touch handling with proper mobile momentum and snapping
+  // Touch handling
   useEffect(() => {
     if (projectList.length === 0) return;
 
@@ -343,12 +375,11 @@ export default function Home({
         startOffset: currentScrollOffsetRef.current,
         lastX: touch.clientX,
         lastTime: performance.now(),
-        velocityHistory: [], // Track velocity over time for better momentum
+        velocityHistory: [],
       };
       setIsDragging(true);
       momentumRef.current = 0;
 
-      // Clear any existing snap timeout
       if (snapTimeoutRef.current) {
         clearTimeout(snapTimeoutRef.current);
       }
@@ -373,24 +404,19 @@ export default function Home({
 
       setScrollOffset(newOffset);
       updateScrollTransform(newOffset);
-
-      // Update active thumbnail immediately during drag
       updateActiveThumbnailFromOffset(newOffset);
 
-      // Track velocity history for smoother momentum calculation
       const timeDelta = currentTime - dragStateRef.current.lastTime;
       const positionDelta = touch.clientX - dragStateRef.current.lastX;
 
       if (timeDelta > 0) {
         const velocity = positionDelta / timeDelta;
 
-        // Keep a rolling history of recent velocities
         dragStateRef.current.velocityHistory.push({
           velocity,
           time: currentTime,
         });
 
-        // Keep only recent history (last 100ms)
         dragStateRef.current.velocityHistory =
           dragStateRef.current.velocityHistory.filter(
             (entry) => currentTime - entry.time < 100
@@ -407,36 +433,36 @@ export default function Home({
       dragStateRef.current.isDragging = false;
       setIsDragging(false);
 
-      // Calculate momentum based on velocity history
-      let finalVelocity = 0;
-
-      if (dragStateRef.current.velocityHistory.length > 0) {
-        // Average the recent velocities for smoother momentum
-        const recentVelocities = dragStateRef.current.velocityHistory.slice(-3); // Last 3 samples
-        finalVelocity =
-          recentVelocities.reduce((sum, entry) => sum + entry.velocity, 0) /
-          recentVelocities.length;
-
-        // Scale velocity for momentum (higher multiplier for mobile)
-        const velocityMultiplier = isTouchDevice ? 20 : 16;
-        finalVelocity *= velocityMultiplier;
-
-        // Apply minimum threshold and maximum cap
-        if (Math.abs(finalVelocity) > 2) {
-          finalVelocity =
-            Math.sign(finalVelocity) * Math.min(Math.abs(finalVelocity), 50); // Cap max velocity
-          momentumRef.current = finalVelocity;
-          startAnimationLoop();
-        } else {
-          // No significant momentum, snap immediately
-          setTimeout(snapToPosition, 150); // Shorter delay on mobile
-        }
+      // Skip momentum calculation on Safari but keep snapping
+      if (isSafari) {
+        setTimeout(snapToPosition, 100); // Shorter delay for Safari
       } else {
-        // No velocity data, snap immediately
-        setTimeout(snapToPosition, 150);
+        // Only calculate momentum for non-Safari browsers
+        let finalVelocity = 0;
+
+        if (dragStateRef.current.velocityHistory.length > 0) {
+          const recentVelocities =
+            dragStateRef.current.velocityHistory.slice(-3);
+          finalVelocity =
+            recentVelocities.reduce((sum, entry) => sum + entry.velocity, 0) /
+            recentVelocities.length;
+
+          const velocityMultiplier = isTouchDevice ? 20 : 16;
+          finalVelocity *= velocityMultiplier;
+
+          if (Math.abs(finalVelocity) > 2) {
+            finalVelocity =
+              Math.sign(finalVelocity) * Math.min(Math.abs(finalVelocity), 50);
+            momentumRef.current = finalVelocity;
+            startAnimationLoop();
+          } else {
+            setTimeout(snapToPosition, 150);
+          }
+        } else {
+          setTimeout(snapToPosition, 150);
+        }
       }
 
-      // Re-enable transitions after a delay
       setTimeout(() => {
         if (thumbnailGridRef.current && !isTouchDevice) {
           thumbnailGridRef.current.style.transition = "transform 0.3s ease-out";
@@ -464,6 +490,7 @@ export default function Home({
     startAnimationLoop,
     snapToPosition,
     updateActiveThumbnailFromOffset,
+    isSafari,
   ]);
 
   // Keyboard navigation
@@ -521,9 +548,8 @@ export default function Home({
     updateScrollTransform,
   ]);
 
-  // Update active thumbnail on scroll offset changes (fallback for non-momentum changes)
+  // Update active thumbnail on scroll offset changes
   useEffect(() => {
-    // Only use DOM-based detection when not in momentum mode
     if (momentumRef.current === 0) {
       updateActiveThumbnailFromDOM();
     }
@@ -554,7 +580,7 @@ export default function Home({
     projectList.length,
   ]);
 
-  // Optimized thumbnail click
+  // Thumbnail click handler
   const handleThumbnailClick = useCallback(
     (index) => {
       if (index >= thumbnailPositions.length) return;
@@ -562,7 +588,6 @@ export default function Home({
       setIsKeyboardNavigating(false);
       momentumRef.current = 0;
 
-      // Clear any existing snap timeout
       if (snapTimeoutRef.current) {
         clearTimeout(snapTimeoutRef.current);
       }
@@ -570,7 +595,6 @@ export default function Home({
       const targetOffset = -thumbnailPositions[index];
       const clampedOffset = clampOffset(targetOffset, minOffset, maxOffset);
 
-      // Disable transition temporarily for immediate positioning
       if (thumbnailGridRef.current) {
         const hadTransition =
           thumbnailGridRef.current.style.transition !== "none";
@@ -611,7 +635,7 @@ export default function Home({
     [currentPage, isTransitioning]
   );
 
-  // Cleanup animation frame and timeouts on unmount
+  // Cleanup
   useEffect(() => {
     return () => {
       if (animationFrameRef.current) {
@@ -623,7 +647,7 @@ export default function Home({
     };
   }, []);
 
-  // Initialize scroll position
+  // Initialize
   useEffect(() => {
     setScrollOffset(0);
     setActiveThumbnail(0);
@@ -633,7 +657,7 @@ export default function Home({
   const featuredImage = {
     initial: {
       opacity: 0.25,
-      x: "-100%"
+      x: "-100%",
     },
     enter: {
       opacity: 1,
@@ -642,7 +666,7 @@ export default function Home({
         type: "tween",
         duration: 0.75,
         ease: [0, 0.55, 0.45, 1],
-        delay: 0.25
+        delay: 0.25,
       },
     },
     exit: {
@@ -651,7 +675,7 @@ export default function Home({
       transition: {
         duration: 0.5,
         type: "tween",
-      }
+      },
     },
   };
 
@@ -671,7 +695,7 @@ export default function Home({
     exit: {
       transition: {
         duration: 0.5,
-        staggerChildren: (0.025),
+        staggerChildren: 0.025,
         ease: [0.12, 0, 0.39, 0],
       },
     },
@@ -679,7 +703,7 @@ export default function Home({
 
   const thumbnailAnimation = {
     initial: {
-      y: "calc(100% + 10px)",
+      y: "calc(100% + 16px)",
       opacity: 0.5,
       transition: {
         duration: 0.5,
@@ -697,7 +721,7 @@ export default function Home({
       },
     },
     exit: {
-      y: "calc(100% + 10px)",
+      y: "calc(100% + 20px)",
       opacity: 0.5,
       transition: {
         duration: 0.5,
@@ -715,21 +739,24 @@ export default function Home({
             variants={pageAnimation}
             style={{
               gap: `${dynamicGap}px`,
-              transition: isTouchDevice ? "none" : "transform 0.3s ease-out",
+              transition:
+                isTouchDevice || isSafari ? "none" : "transform 0.3s ease-out",
               transform: `translate3d(${scrollOffset}px, 0, 0)`,
             }}
             className={`work__container${isDragging ? " dragging" : ""}`}
+            ref={thumbnailGridRef}
           >
             <div
               className="featured"
+              ref={featuredRef}
               style={{
-                transform: `translateX(${-scrollOffset}px)`,
-                transition: isTouchDevice ? "none" : undefined,
+                transform: `translate3d(${-scrollOffset}px, 0, 0)`,
+                transition: isTouchDevice || isSafari ? "none" : undefined,
               }}
             >
               <motion.img
                 {...anim(featuredImage)}
-                ref={featuredRef}
+                // ref={featuredRef}
                 src={home.assets[activeThumbnail].url}
                 alt={home.assets[activeThumbnail].alt}
               />

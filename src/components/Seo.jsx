@@ -22,24 +22,6 @@ export default function Seo() {
 
         {/* START FAVICON */}
         <link
-          rel="apple-touch-icon"
-          sizes="180x180"
-          href="/images/png/rattle-apple-touch-icon.png"
-        />
-        <link rel="icon" href="/images/png/rattle-favicon.png" sizes="32x32" />
-        <link
-          rel="icon"
-          href="/images/favicon_dark.png"
-          type="image/svg+xml"
-          media="(prefers-color-scheme: dark)"
-        />
-        <link
-          rel="icon"
-          href="/images/favicon_light.png"
-          type="image/svg+xml"
-          media="(prefers-color-scheme: light)"
-        />
-        <link
           rel="icon"
           type="image/png"
           href="/images/favicon_light.png"
