@@ -66,7 +66,7 @@
       height: 100%;
       max-width: 100%;
       object-fit: contain;
-      object-position: bottom center;
+      object-position: center center;
     }
   }
 
@@ -108,6 +108,10 @@
     .featured {
       left: 1.6rem;
       width: calc(100vw - 3.2rem);
+
+      img {
+        object-position: bottom center;
+      }
     }
   }
 }

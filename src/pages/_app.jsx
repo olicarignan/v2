@@ -8,6 +8,7 @@ import { fetcher } from "@/utils/propData";
 import { getHome } from "@/gql/queries.js";
 import Seo from "@/components/Seo";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export default function App({ Component, pageProps, router }) {
   const [loading, setLoading] = useState(true);
@@ -41,6 +42,7 @@ export default function App({ Component, pageProps, router }) {
         )}
       </AnimatePresence>
       <Analytics />
+      <SpeedInsights />
     </>
   );
 }
