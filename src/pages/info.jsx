@@ -83,19 +83,29 @@ export default function Info({ info }) {
         x: 0,
         transition: { duration: 0.5, ease: [0, 0.55, 0.45, 1] },
       },
-    }
+    };
   };
 
   const hero = {
     initial: {
-      opacity: 0.5,
-    },
-    enter: {
-      opacity: 1,
+      filter: "blur(10px)",
+      opacity: 0,
+      y: -200,
+      x: 0,
       transition: { duration: 0.5, ease: [0.32, 0, 0.67, 0] },
     },
+    enter: {
+      filter: "blur(0px)",
+      opacity: 1,
+      y: 0,
+      x: 0,
+      transition: { duration: 0.5, ease: [0, 0.55, 0.45, 1] },
+    },
     exit: {
+      filter: "blur(10px)",
       opacity: 0.5,
+      y: -200,
+      x: 0,
       transition: { duration: 0.5, ease: [0.32, 0, 0.67, 0] },
     },
   };
