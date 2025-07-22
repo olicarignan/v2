@@ -679,8 +679,8 @@ export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
       },
     },
     exit: {
-      opacity: 0.25,
-      x: "-100%",
+      opacity: 1,
+      x: 0,
       transition: {
         duration: 0.5,
         type: "tween",
@@ -730,13 +730,8 @@ export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
       },
     },
     exit: {
-      y: "calc(100% + 20px)",
-      opacity: 0.5,
-      transition: {
-        duration: 0.5,
-        type: "tween",
-        ease: [0, 0.55, 0.45, 1],
-      },
+      y: 0,
+      opacity: 1,
     },
   };
 

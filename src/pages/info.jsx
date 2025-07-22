@@ -25,11 +25,7 @@ export default function Info({ info }) {
       },
     },
     exit: {
-      width: 0,
-      transition: {
-        duration: 0.5,
-        ease: [0, 0.55, 0.45, 1],
-      },
+      width: "100%",
     },
   };
 
@@ -91,21 +87,18 @@ export default function Info({ info }) {
       filter: "blur(10px)",
       opacity: 0,
       y: -200,
-      x: 0,
       transition: { duration: 0.5, ease: [0.32, 0, 0.67, 0] },
     },
     enter: {
       filter: "blur(0px)",
       opacity: 1,
       y: 0,
-      x: 0,
       transition: { duration: 0.5, ease: [0, 0.55, 0.45, 1] },
     },
     exit: {
-      filter: "blur(10px)",
+      filter: "blur(0px)",
       opacity: 0.5,
       y: 0,
-      x: 200,
       transition: { duration: 0.5, ease: [0.32, 0, 0.67, 0] },
     },
   };

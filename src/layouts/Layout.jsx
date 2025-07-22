@@ -12,16 +12,16 @@ export default function Layout({ children}) {
 
   const slideInfo = {
     inital: {
-      x: "-100vw",
-      transition: { type: "tween", duration: 0}
+      x: "100vw",
+      transition: { type: "tween", duration: 0 },
     },
     enter: {
-      x: "-100vw",
-      transition: { type: "tween", duration: 0}
+      x: "100vw",
+      transition: { type: "tween", duration: 0 },
     },
     exit: {
       x: 0,
-      transition: { duration: 0.5, ease: [0.85, 0, 0.15, 1] },
+      transition: { duration: 1, ease: [0.87, 0, 0.13, 1] },
     },
   };
 
@@ -35,8 +35,8 @@ export default function Layout({ children}) {
       transition: { type: "tween", duration: 0}
     },
     exit: {
-      x: "-100vw",
-      transition: { duration: 1, ease: [0.85, 0, 0.15, 1] },
+      x: 0,
+      transition: { duration: 1, ease: [0.87, 0, 0.13, 1] },
     },
   };
 
@@ -50,11 +50,11 @@ export default function Layout({ children}) {
       opacity: 1,
     },
     exit: {
-      x: "10vw",
+      x: 100,
       opacity: 0.5,
-      transition: { duration: 1, ease: [0.85, 0, 0.15, 1] },
-    }
-  }
+      transition: { duration: 1, ease: [0.87, 0, 0.13, 1] },
+    },
+  };
 
   const perspectiveHome = {
     initial: {
@@ -66,20 +66,33 @@ export default function Layout({ children}) {
       opacity: 1,
     },
     exit: {
-      x: 0,
+      x: -100,
       opacity: 0.5,
-      transition: { duration: 1, ease: [0.85, 0, 0.15, 1] },
+      transition: { duration: 1, ease: [0.87, 0, 0.13, 1] },
     }
   }
 
-
+  const overlay = {
+    initial: {
+      opacity: 0,
+    },
+    enter: {
+      opacity: 0,
+      transition: { duration: 1, ease: [0.87, 0, 0.13, 1] },
+    },
+    exit: {
+      opacity: 0.5,
+      transition: { duration: 1, ease: [0.87, 0, 0.13, 1] },
+    },
+  };
 
   return (
     <div className="layout">
       <Nav />
       <motion.div className="slide--loader" />
       <motion.div {...anim( router.pathname === "/" ? slideInfo : slideHome)} className="slide" />
-      <motion.div {...anim( router.pathname === "/" ? perspectiveInfo : perspectiveHome)}>
+      <motion.div {...anim( router.pathname === "/" ? perspectiveInfo : perspectiveHome)} className="perspective">
+      <motion.div className="overlay" {...anim(overlay)} />
         <motion.div className="grid">
           {children}
         </motion.div>

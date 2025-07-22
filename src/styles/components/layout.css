@@ -1,6 +1,6 @@
 .layout {
-  position: relative;
   --100dvh: calc(var(--vh, 1dvh) * 100);
+  position: relative;
 
   .slide {
     background-color: var(--background-color);
@@ -14,6 +14,21 @@
     transition: none;
   }
 
-  @media (min-width: 768px) {
+  .perspective {
+    position: relative;
+  }
+
+  .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: var(--100dvh);
+    background-color: light-dark(
+      rgba(27, 25, 23, 0.5),
+      rgba(252, 251, 248, 0.5)
+    );
+    opacity: 0;
+    backdrop-filter: blur(25px);
   }
 }
