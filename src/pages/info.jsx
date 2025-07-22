@@ -104,8 +104,8 @@ export default function Info({ info }) {
     exit: {
       filter: "blur(10px)",
       opacity: 0.5,
-      y: -200,
-      x: 0,
+      y: 0,
+      x: 200,
       transition: { duration: 0.5, ease: [0.32, 0, 0.67, 0] },
     },
   };

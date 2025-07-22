@@ -50,7 +50,7 @@
     position: fixed;
     bottom: calc(3.2rem + 12dvh);
     height: 100%;
-    max-height: calc(var(--100dvh) - 8.8rem - 12dvh);
+    max-height: calc(var(--100dvh) - 8rem - 12dvh);
     left: 0.8rem;
     width: calc(100vw - 1.6rem);
     pointer-events: none;
@@ -108,6 +108,10 @@
     .featured {
       left: 1.6rem;
       width: calc(100vw - 3.2rem);
+
+      img {
+        object-position: top center;
+      }
     }
   }
 }
