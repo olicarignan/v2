@@ -1,17 +1,17 @@
 "use client";
 
-import { color, motion } from "motion/react";
+import { motion } from "motion/react";
 
 import { getPropData } from "@/utils/propData";
 import { getInfo } from "@/gql/queries.js";
-
 import Montreal from "@/components/icons/Montreal";
-
 import Layout from "@/layouts/Layout";
 import { anim } from "@/utils/animate";
+import { useMobile } from "@/hooks/useMobile";
 
 export default function Info({ info }) {
   const { clients, services } = info;
+  const isMobile = useMobile();
 
   const line = {
     initial: {
@@ -48,19 +48,42 @@ export default function Info({ info }) {
     },
   };
 
-  const article = {
-    hidden: {
-      filter: "blur(10px)",
-      opacity: 0,
-      y: "-100%",
-      transition: { duration: 0.5, ease: [0.32, 0, 0.67, 0] },
-    },
-    visible: {
-      filter: "blur(0px)",
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.5, ease: [0, 0.55, 0.45, 1] },
-    },
+  const article = (isMobile) => {
+    if (isMobile) {
+      return {
+        hidden: {
+          filter: "blur(10px)",
+          opacity: 0,
+          x: "-100%",
+          y: 0,
+          transition: { duration: 0.3, ease: [0.32, 0, 0.67, 0] },
+        },
+        visible: {
+          filter: "blur(0px)",
+          opacity: 1,
+          x: 0,
+          y: 0,
+          transition: { duration: 0.3, ease: [0, 0.55, 0.45, 1] },
+        },
+      };
+    }
+
+    return {
+      hidden: {
+        filter: "blur(10px)",
+        opacity: 0,
+        y: "-100%",
+        x: 0,
+        transition: { duration: 0.5, ease: [0.32, 0, 0.67, 0] },
+      },
+      visible: {
+        filter: "blur(0px)",
+        opacity: 1,
+        y: 0,
+        x: 0,
+        transition: { duration: 0.5, ease: [0, 0.55, 0.45, 1] },
+      },
+    }
   };
 
   const hero = {
@@ -104,7 +127,7 @@ export default function Info({ info }) {
             initial="hidden"
             className="body"
           >
-            <motion.article variants={article} className="contact">
+            <motion.article variants={article(isMobile)} className="contact">
               <div className="contact__inner">
                 <h2>Contact</h2>
                 <p>
@@ -135,7 +158,7 @@ export default function Info({ info }) {
               </span>
             </motion.article>
 
-            <motion.article variants={article} className="services">
+            <motion.article variants={article(isMobile)} className="services">
               <h2>Services</h2>
               <ul>
                 {services.map((service) => {
@@ -144,7 +167,7 @@ export default function Info({ info }) {
               </ul>
             </motion.article>
 
-            <motion.article variants={article} className="clients">
+            <motion.article variants={article(isMobile)} className="clients">
               <h2>Clients</h2>
               <ul>
                 {clients.map((client) => {

@@ -22,7 +22,7 @@
     display: flex;
 
     span {
-      font-size: clamp(6rem, 18vh, 18vh);
+      font-size: clamp(6rem, 12vh, 18vh);
     }
   }
 
