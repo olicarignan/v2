@@ -53,8 +53,8 @@
       content: "";
       position: absolute;
       bottom: -0.2rem;
-      left: auto;
-      right: 0;
+      left: 0;
+      right: auto;
       width: 0;
       height: 0.1rem;
       background-color: var(--text-color);
@@ -68,8 +68,8 @@
 
   .item--second {
     &::after {
-      right: auto;
-      left: 0;
+      right: 0;
+      left: auto;
     }
   }
 

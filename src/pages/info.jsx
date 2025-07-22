@@ -39,7 +39,7 @@ export default function Info({ info }) {
         duration: 0.3,
         ease: [0, 0.55, 0.45, 1],
         when: "beforeChildren",
-        staggerChildren: 0.1,
+        staggerChildren: 0.05,
       },
     },
   };
@@ -86,7 +86,7 @@ export default function Info({ info }) {
     initial: {
       filter: "blur(10px)",
       opacity: 0,
-      y: -200,
+      y: -25,
       transition: { duration: 0.5, ease: [0.32, 0, 0.67, 0] },
     },
     enter: {

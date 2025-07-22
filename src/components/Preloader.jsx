@@ -38,12 +38,16 @@ export default function Preloader({ progress, total }) {
   }
 
   return (
-    <motion.div {...anim(slideOut)} className="preloader grid">
+    <motion.div className="preloader grid">
       <div className="progress">
-        <span suppressHydrationWarning>{progress}</span>
+        <motion.span {...anim(slideOut)} suppressHydrationWarning>
+          {progress}
+        </motion.span>
       </div>
       <div className="total">
-        <span suppressHydrationWarning>{total}</span>
+        <motion.span {...anim(slideOut)} suppressHydrationWarning>
+          {total}
+        </motion.span>
       </div>
     </motion.div>
   );

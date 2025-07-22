@@ -23,6 +23,7 @@
 
     span {
       font-size: clamp(6rem, 12vh, 18vh);
+      height: fit-content;
     }
   }
 
