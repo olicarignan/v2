@@ -48,7 +48,7 @@
 
   .featured {
     position: fixed;
-    bottom: calc(3.2rem + 12dvh);
+    top: 4.8rem;
     height: 100%;
     max-height: calc(var(--100dvh) - 8rem - 12dvh);
     left: 0.8rem;
@@ -66,7 +66,7 @@
       height: 100%;
       max-width: 100%;
       object-fit: contain;
-      object-position: bottom center;
+      object-position: center center;
     }
   }
 
@@ -108,6 +108,7 @@
     .featured {
       left: 1.6rem;
       width: calc(100vw - 3.2rem);
+      max-height: calc(var(--100dvh) - 8rem - 16dvh);
 
       img {
         object-position: top center;

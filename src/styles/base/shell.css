@@ -35,7 +35,7 @@ body {
 }
 
 *::selection {
-  text-shadow: 0 0 0.5rem var(--text-color);
+  text-shadow: 0 0 0.75rem var(--text-color);
   color: transparent;
   background-color: transparent;
 }

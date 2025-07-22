@@ -475,6 +475,7 @@ export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
       setTimeout(() => {
         if (thumbnailGridRef.current && !isTouchDevice) {
           thumbnailGridRef.current.style.transition = "transform 0.3s ease-out";
+          featuredRef.current.style.transition = "transform 0.3s ease-out";
         }
       }, 50);
     };
@@ -608,9 +609,11 @@ export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
         const hadTransition =
           thumbnailGridRef.current.style.transition !== "none";
         thumbnailGridRef.current.style.transition = "none";
+        featuredRef.current.style.transition = "none";
 
         setTimeout(() => {
           if (thumbnailGridRef.current && hadTransition && !isTouchDevice) {
+            featuredRef.current.style.transition = "transform 0.3s ease-out";
             thumbnailGridRef.current.style.transition =
               "transform 0.3s ease-out";
           }
@@ -675,7 +678,6 @@ export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
         type: "tween",
         duration: 0.75,
         ease: [0, 0.55, 0.45, 1],
-        delay: 0.25,
       },
     },
     exit: {
@@ -755,7 +757,7 @@ export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
               ref={featuredRef}
               style={{
                 transform: `translate3d(${-scrollOffset}px, 0, 0)`,
-                transition: isTouchDevice || isSafari ? "none" : undefined,
+                transition: isTouchDevice || isSafari ? "none" : "transform 0.3s ease-out",
               }}
             >
               <motion.img
