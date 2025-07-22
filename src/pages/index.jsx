@@ -666,11 +666,11 @@ export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
   const featuredImage = {
     initial: {
       opacity: 0.25,
-      x: "-100%",
+      y: "-100%",
     },
     enter: {
       opacity: 1,
-      x: 0,
+      y: 0,
       transition: {
         type: "tween",
         duration: 0.75,
@@ -680,7 +680,7 @@ export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
     },
     exit: {
       opacity: 0.25,
-      x: "-100%",
+      y: "-100%",
       transition: {
         duration: 0.5,
         type: "tween",
