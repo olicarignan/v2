@@ -16,7 +16,7 @@
   .hero {
     padding: var(--hero-padding);
     font-family: var(--font-serif);
-    font-size: clamp(2.8rem, 3.17vw, 3.17vw);
+    font-size: clamp(2.4rem, 3.17vw, 3.17vw);
     font-weight: 300;
 
     sup {
@@ -61,8 +61,8 @@
 
         svg {
           fill: var(--text-color);
-          width: clamp(1.4rem, 1vw, 2rem);
-          height: clamp(1.4rem, 1vw, 2rem);
+          width: clamp(1.4rem, 1vw, 1.6rem);
+          height: clamp(1.4rem, 1vw, 1.6rem);
         }
       }
 

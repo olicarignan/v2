@@ -21,6 +21,16 @@
     flex-basis: calc(100% / 3);
   }
 
+  .wrapper {
+    display: inline-block;
+
+    * {
+      will-change: transform;
+      transform: translate3d(0, 0, 0);
+      backface-visibility: hidden;
+    }
+  }
+
   .logo {
     display: inline-block;
 

@@ -334,7 +334,7 @@ export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
             momentumRef.current = 0;
 
             const newOffset = clampOffset(
-              currentScrollOffsetRef.current - scrollDelta * 0.9,
+              currentScrollOffsetRef.current - scrollDelta * 0.7,
               minOffset,
               maxOffset
             );
@@ -668,12 +668,12 @@ export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
 
   const featuredImage = {
     initial: {
-      opacity: 0.25,
-      x: "-100%",
+      opacity: 0,
+      clipPath: "inset(0 100% 0 0)"
     },
     enter: {
       opacity: 1,
-      x: 0,
+      clipPath: "inset(0 0 0 0)",
       transition: {
         type: "tween",
         duration: 0.75,
@@ -682,11 +682,7 @@ export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
     },
     exit: {
       opacity: 1,
-      x: 0,
-      transition: {
-        duration: 0.5,
-        type: "tween",
-      },
+      clipPath: "inset(0 0 0 0)",
     },
   };
 

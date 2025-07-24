@@ -21,7 +21,7 @@ export default function Layout({ children}) {
     },
     exit: {
       x: 0,
-      transition: { duration: 1, ease: [0.87, 0, 0.13, 1] },
+      transition: { duration: 1, ease: [0.85, 0, 0.15, 1] },
     },
   };
 
@@ -36,7 +36,7 @@ export default function Layout({ children}) {
     },
     exit: {
       x: 0,
-      transition: { duration: 1, ease: [0.87, 0, 0.13, 1] },
+      transition: { duration: 1, ease: [0.85, 0, 0.15, 1] },
     },
   };
 
@@ -52,7 +52,7 @@ export default function Layout({ children}) {
     exit: {
       x: 100,
       opacity: 0.5,
-      transition: { duration: 1, ease: [0.87, 0, 0.13, 1] },
+      transition: { duration: 1, ease: [0.85, 0, 0.15, 1] },
     },
   };
 
@@ -68,7 +68,7 @@ export default function Layout({ children}) {
     exit: {
       x: -100,
       opacity: 0.5,
-      transition: { duration: 1, ease: [0.87, 0, 0.13, 1] },
+      transition: { duration: 1, ease: [0.85, 0, 0.15, 1] },
     }
   }
 
@@ -78,17 +78,17 @@ export default function Layout({ children}) {
     },
     enter: {
       opacity: 0,
-      transition: { duration: 1, ease: [0.87, 0, 0.13, 1] },
+      transition: { duration: 1, ease: [0.85, 0, 0.15, 1] },
     },
     exit: {
       opacity: 0.5,
-      transition: { duration: 1, ease: [0.87, 0, 0.13, 1] },
+      transition: { duration: 1, ease: [0.85, 0, 0.15, 1] },
     },
   };
 
   return (
     <div className="layout">
-      <Nav />
+      {/* <Nav /> */}
       <motion.div className="slide--loader" />
       <motion.div {...anim( router.pathname === "/" ? slideInfo : slideHome)} className="slide" />
       <motion.div {...anim( router.pathname === "/" ? perspectiveInfo : perspectiveHome)} className="perspective">

@@ -8,10 +8,30 @@ import Montreal from "@/components/icons/Montreal";
 import Layout from "@/layouts/Layout";
 import { anim } from "@/utils/animate";
 import { useMobile } from "@/hooks/useMobile";
+import { SplitText } from "@/components/SplitText";
 
 export default function Info({ info }) {
   const { clients, services } = info;
   const isMobile = useMobile();
+
+  const heroText = isMobile
+    ? [
+        "Olivier Carignan<sup><span class='serif'>(</span><span class='sans'>©</span><span class='serif'>)</span></sup> is conducting ",
+        "an independent design-led ",
+        "development and multidisciplinary ",
+        "design practice. I partner with",
+        "studios, brands and individuals",
+        "worldwide to build thoughtful, ",
+        "expressive digital experiences at the ",
+        "intersection of design, technology, ",
+        "and culture.",
+      ]
+    : [
+        "Olivier Carignan<sup><span class='serif'>(</span><span class='sans'>©</span><span class='serif'>)</span></sup> is conducting an independent design-led development and ",
+        "multidisciplinary design practice. I partner with studios, brands and individuals ",
+        "worldwide to build thoughtful, expressive digital experiences at the ",
+        "intersection of design, technology, and culture.",
+      ];
 
   const line = {
     initial: {
@@ -38,7 +58,6 @@ export default function Info({ info }) {
       transition: {
         duration: 0.3,
         ease: [0, 0.55, 0.45, 1],
-        when: "beforeChildren",
         staggerChildren: 0.05,
       },
     },
@@ -49,8 +68,8 @@ export default function Info({ info }) {
       return {
         hidden: {
           filter: "blur(10px)",
-          opacity: 0,
-          x: "-100%",
+          opacity: 0.25,
+          x: -100,
           y: 0,
           transition: { duration: 0.3, ease: [0.32, 0, 0.67, 0] },
         },
@@ -83,23 +102,29 @@ export default function Info({ info }) {
   };
 
   const hero = {
-    initial: {
-      filter: "blur(10px)",
-      opacity: 0,
-      y: -25,
-      transition: { duration: 0.5, ease: [0.32, 0, 0.67, 0] },
+    visible: {
+      transition: {
+        staggerChildren: isMobile ? 0.025 : 0.05,
+        ease: [0.12, 0, 0.39, 0],
+      },
     },
-    enter: {
-      filter: "blur(0px)",
-      opacity: 1,
-      y: 0,
+    hidden: {
+      transition: {
+        staggerChildren: 0,
+      },
+    },
+  };
+
+  const textAnimation = {
+    hidden: {
+      y: "100%",
+      opacity: 0,
       transition: { duration: 0.5, ease: [0, 0.55, 0.45, 1] },
     },
-    exit: {
-      filter: "blur(0px)",
-      opacity: 0.5,
+    visible: {
       y: 0,
-      transition: { duration: 0.5, ease: [0.32, 0, 0.67, 0] },
+      opacity: 1,
+      transition: { duration: 0.5, ease: [0, 0.55, 0.45, 1] },
     },
   };
 
@@ -107,21 +132,39 @@ export default function Info({ info }) {
     <Layout>
       <main className="info">
         <div className="info__wrapper">
-          <div className="hero">
-            <motion.p {...anim(hero)}>
-              Olivier Carignan
-              <sup>
-                <span className="serif">{"("}</span>
-                <span className="sans">©</span>
-                <span className="serif">{")"}</span>
-              </sup>
-              &nbsp;is conducting an independent design-led development and
-              multidisciplinary design practice. I partner with studios, brands
-              and individuals worldwide to build thoughtful, expressive digital
-              experiences at the intersection of design, technology, and
-              culture.
-            </motion.p>
-          </div>
+          <motion.div
+            className="hero"
+            variants={hero}
+            animate="visible"
+            initial="hidden"
+          >
+            {/* <SplitText>
+              Olivier Carignan is conducting an independent design-led development and
+              multidisciplinary design practice. I partner with studios, brands and individuals
+              worldwide to build thoughtful,expressive digital experiences at the
+              intersection of design, technology, and culture.
+            </SplitText> */}
+            {heroText.map((text, index) => (
+              <div
+                className="wrapper"
+                style={{
+                  display: "inline-block",
+                  overflow: "hidden",
+                  whiteSpace: "nowrap",
+                  position: "relative",
+                }}
+              >
+                <motion.div
+                  key={index}
+                  variants={textAnimation}
+                  className="hero__text"
+                  dangerouslySetInnerHTML={{
+                    __html: text,
+                  }}
+                />
+              </div>
+            ))}
+          </motion.div>
 
           <motion.div {...anim(line)} className="divider" />
           <motion.div

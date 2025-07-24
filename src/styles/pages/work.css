@@ -67,6 +67,8 @@
       max-width: 100%;
       object-fit: contain;
       object-position: center center;
+      will-change: clip-path;
+      clip-path: inset(0 0 0 0);
     }
   }
 

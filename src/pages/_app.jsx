@@ -9,6 +9,7 @@ import { getHome } from "@/gql/queries.js";
 import Seo from "@/components/Seo";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import Nav from "@/components/Nav";
 
 export default function App({ Component, pageProps, router }) {
   const [loading, setLoading] = useState(true);
@@ -34,6 +35,7 @@ export default function App({ Component, pageProps, router }) {
   return (
     <>
       <Seo />
+      {!loading && <Nav />}
       <AnimatePresence mode="wait" initial="false">
         {loading ? (
           <Preloader progress={progress} total={total} />
