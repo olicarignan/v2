@@ -14,7 +14,7 @@ import Nav from "@/components/Nav";
 export default function App({ Component, pageProps, router }) {
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState("00");
-  const [total, setTotal] = useState("19");
+  const [total, setTotal] = useState("20");
 
   const { data } = useSWR(getHome, (query) => fetcher(query));
 
