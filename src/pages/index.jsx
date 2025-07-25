@@ -25,8 +25,6 @@ export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
   const [isKeyboardNavigating, setIsKeyboardNavigating] = useState(false);
   const [isSafari, setIsSafari] = useState(false);
 
-  console.log(home)
-
   // Refs
   const thumbnailRefs = useRef([]);
   const thumbnailGridRef = useRef(null);
