@@ -13,6 +13,7 @@ import {
 } from "@/utils/helpers";
 import { anim } from "@/utils/animate";
 import Layout from "@/layouts/Layout";
+import { FeaturedAsset } from "@/components/FeaturedAsset";
 
 export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
   const [scrollOffset, setScrollOffset] = useState(0);
@@ -23,6 +24,8 @@ export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
   const [isDragging, setIsDragging] = useState(false);
   const [isKeyboardNavigating, setIsKeyboardNavigating] = useState(false);
   const [isSafari, setIsSafari] = useState(false);
+
+  console.log(home)
 
   // Refs
   const thumbnailRefs = useRef([]);
@@ -748,40 +751,57 @@ export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
             className={`work__container${isDragging ? " dragging" : ""}`}
             ref={thumbnailGridRef}
           >
-            <div
+            <motion.div
               className="featured"
               ref={featuredRef}
               style={{
                 transform: `translate3d(${-scrollOffset}px, 0, 0)`,
-                transition: isTouchDevice || isSafari ? "none" : "transform 0.3s ease-out",
+                transition:
+                  isTouchDevice || isSafari
+                    ? "none"
+                    : "transform 0.3s ease-out",
               }}
+              {...anim(featuredImage)}
             >
-              <motion.img
-                {...anim(featuredImage)}
-                // ref={featuredRef}
-                src={home.assets[activeThumbnail].url}
-                alt={home.assets[activeThumbnail].alt}
-              />
-            </div>
+              <FeaturedAsset asset={home.assets[activeThumbnail]} />
+            </motion.div>
             <div
               className="cursor"
               ref={cursorRef}
               style={{ transform: `translateX(${-scrollOffset}px)` }}
             />
             {home.assets.map((asset, index) => {
-              return (
-                <motion.div
-                  variants={thumbnailAnimation}
-                  className={`item${
-                    index === activeThumbnail ? " active" : ""
-                  }`}
-                  key={asset.id}
-                  ref={(el) => (thumbnailRefs.current[index] = el)}
-                  onClick={() => handleThumbnailClick(index)}
-                >
-                  <img src={asset.url} alt={asset.alt} draggable="false" />
-                </motion.div>
-              );
+              if (asset.format === "jpg") {
+                return (
+                  <motion.div
+                    variants={thumbnailAnimation}
+                    className={`item${
+                      index === activeThumbnail ? " active" : ""
+                    }`}
+                    key={asset.id}
+                    ref={(el) => (thumbnailRefs.current[index] = el)}
+                    onClick={() => handleThumbnailClick(index)}
+                  >
+                    <img src={asset.url} alt={asset.alt} draggable="false" />
+                  </motion.div>
+                );
+              }
+
+              if (asset.format === "mp4") {
+                return (
+                  <motion.div
+                    variants={thumbnailAnimation}
+                    className={`item${
+                      index === activeThumbnail ? " active" : ""
+                    }`}
+                    key={asset.id}
+                    ref={(el) => (thumbnailRefs.current[index] = el)}
+                    onClick={() => handleThumbnailClick(index)}
+                  >
+                    <img src={asset.video.thumbnailUrl} alt={asset.alt} draggable="false" />
+                  </motion.div>
+                );
+              }
             })}
           </motion.div>
         </div>

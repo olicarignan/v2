@@ -5,6 +5,7 @@ export const getHome = gql`
     home {
       assets {
         id
+        format
         alt
         url
         blurUpThumb
@@ -13,6 +14,13 @@ export const getHome = gql`
         focalPoint {
           x
           y
+        }
+        video {
+          muxPlaybackId
+          blurUpThumb
+          width
+          height
+          thumbnailUrl
         }
       }
     }

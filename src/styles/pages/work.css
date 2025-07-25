@@ -62,7 +62,8 @@
     transition: transform 0.3s ease-out;
     overflow: hidden;
 
-    img {
+    img,
+    video {
       height: 100%;
       max-width: 100%;
       object-fit: contain;

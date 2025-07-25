@@ -1,9 +1,6 @@
 "use client";
 
 import { motion } from "motion/react";
-
-import MonogramInverted from "@/components/icons/MonogramInverted";
-import Monogram from "@/components/icons/Monogram";
 import { anim } from "@/utils/animate";
 
 export default function Preloader({ progress, total }) {
