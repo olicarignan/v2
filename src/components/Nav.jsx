@@ -85,11 +85,12 @@ export default function Nav() {
           <motion.div className="clock" {...anim(slideIn)}>
             <span className="time" suppressHydrationWarning>
               {time.toLocaleTimeString([], {
+                timeZone: "America/New_York",
+                timeZoneName: "short",
                 hour: "2-digit",
                 minute: "2-digit",
                 hour12: false,
               })}
-              &nbsp;EST
             </span>
           </motion.div>
         </div>
