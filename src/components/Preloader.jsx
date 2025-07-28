@@ -5,20 +5,6 @@ import { anim } from "@/utils/animate";
 
 export default function Preloader({ progress, total }) {
 
-  const iconAnimation = {
-    initial: {
-      opacity: 1,
-    },
-    enter: {
-      opacity: 1,
-      transition: { duration: 5, ease: [0, 0.55, 0.45, 1] },
-    },
-    exit: {
-      opacity: 0,
-      transition: { duration: 0.5, ease: [0, 0.55, 0.45, 1] },
-    },
-  };
-
   const slideOut = {
     initial: {
       y: 0,
