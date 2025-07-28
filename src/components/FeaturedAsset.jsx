@@ -13,6 +13,7 @@ export const FeaturedAsset = ({ asset }) => {
         autoPlay
         playsInline
         preload="auto"
+        poster={asset.video.thumbnailUrl}
       />
     );
   }
