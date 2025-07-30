@@ -1,5 +1,4 @@
 .layout {
-  --100dvh: calc(var(--vh, 1dvh) * 100);
   position: relative;
 
   .slide {

@@ -108,7 +108,6 @@
     --hero-padding: 6vw 0;
     --h2-margin: 2rem;
     --contact-order: 0;
-    --100dvh: calc(var(--vh, 1dvh) * 100);
 
     height: var(--100dvh);
     overflow: hidden;
