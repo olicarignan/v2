@@ -18,8 +18,6 @@ import { FeaturedAsset } from "@/components/FeaturedAsset";
 export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
   const [scrollOffset, setScrollOffset] = useState(0);
   const [activeThumbnail, setActiveThumbnail] = useState(0);
-  const [currentPage, setCurrentPage] = useState("WORK");
-  const [isTransitioning, setIsTransitioning] = useState(false);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [isKeyboardNavigating, setIsKeyboardNavigating] = useState(false);
@@ -325,7 +323,6 @@ export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
         if (snapTimeoutRef.current) {
           clearTimeout(snapTimeoutRef.current);
         }
-        // snapTimeoutRef.current = setTimeout(snapToPosition, 150);
       } else {
         // Other browsers: Use RAF
         let ticking = false;
@@ -347,7 +344,6 @@ export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
             if (snapTimeoutRef.current) {
               clearTimeout(snapTimeoutRef.current);
             }
-            // snapTimeoutRef.current = setTimeout(snapToPosition, 200);
 
             ticking = false;
           });
@@ -606,21 +602,6 @@ export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
       const targetOffset = -thumbnailPositions[index];
       const clampedOffset = clampOffset(targetOffset, minOffset, maxOffset);
 
-      if (thumbnailGridRef.current) {
-        const hadTransition =
-          thumbnailGridRef.current.style.transition !== "none";
-        thumbnailGridRef.current.style.transition = "none";
-        featuredRef.current.style.transition = "none";
-
-        setTimeout(() => {
-          if (thumbnailGridRef.current && hadTransition && !isTouchDevice) {
-            featuredRef.current.style.transition = "transform 0.3s ease-out";
-            thumbnailGridRef.current.style.transition =
-              "transform 0.3s ease-out";
-          }
-        }, 50);
-      }
-
       setScrollOffset(clampedOffset);
       setActiveThumbnail(index);
       updateScrollTransform(clampedOffset);
@@ -632,20 +613,6 @@ export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
       updateScrollTransform,
       isTouchDevice,
     ]
-  );
-
-  // Page transition handler
-  const handlePageTransition = useCallback(
-    (newPage) => {
-      if (newPage === currentPage || isTransitioning) return;
-
-      setIsTransitioning(true);
-      setTimeout(() => {
-        setCurrentPage(newPage);
-        setTimeout(() => setIsTransitioning(false), 300);
-      }, 150);
-    },
-    [currentPage, isTransitioning]
   );
 
   // Cleanup
@@ -742,8 +709,8 @@ export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
             variants={pageAnimation}
             style={{
               gap: `${dynamicGap}px`,
-              transition:
-                isTouchDevice || isSafari ? "none" : "transform 0.3s ease-out",
+              // transition:
+              //   isTouchDevice || isSafari ? "none" : "transform 0.3s ease-out",
               transform: `translate3d(${scrollOffset}px, 0, 0)`,
             }}
             className={`work__container${isDragging ? " dragging" : ""}`}
@@ -755,7 +722,7 @@ export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
               style={{
                 transform: `translate3d(${-scrollOffset}px, 0, 0)`,
                 transition:
-                  isTouchDevice || isSafari
+                  isTouchDevice
                     ? "none"
                     : "transform 0.3s ease-out",
               }}
