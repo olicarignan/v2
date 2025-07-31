@@ -4,23 +4,40 @@ export const getHome = gql`
   query getHome {
     home {
       assets {
-        id
-        format
-        alt
-        url
-        blurUpThumb
-        height
-        width
-        focalPoint {
-          x
-          y
+        ... on PhotoRecord {
+          id
+          _modelApiKey
+          photo {
+            id
+            format
+            alt
+            url
+            blurUpThumb
+            height
+            width
+          }
         }
-        video {
-          muxPlaybackId
-          blurUpThumb
-          width
-          height
-          thumbnailUrl
+        ... on VideoRecord {
+          id
+          _modelApiKey
+          thumbnail {
+            id
+            format
+            alt
+            url
+            blurUpThumb
+            height
+            width
+          }
+          video {
+            id
+            format
+            alt
+            url
+            blurUpThumb
+            width
+            height
+          }
         }
       }
     }

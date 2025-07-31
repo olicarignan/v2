@@ -1,13 +1,15 @@
 export const FeaturedAsset = ({ asset }) => {
-  if (asset.format === "jpg" || asset._modelApiKey === "image_asset") {
-    return <img src={asset.url} alt={asset.alt} />;
+  console.log(asset)
+
+  if (asset._modelApiKey === "photo") {
+    return <img src={asset.photo.url} alt={asset.photo.alt} />;
   }
 
-  if (asset.format === "mp4") {
+  if (asset._modelApiKey === "video") {
     return (
       <video
-        src={asset.url}
-        alt={asset.alt}
+        src={asset.video.url}
+        alt={asset.video.alt}
         loop
         muted
         autoPlay

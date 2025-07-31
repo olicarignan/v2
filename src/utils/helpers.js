@@ -32,25 +32,14 @@ export const calculateImageWidth = (
   thumbnailHeight,
   imageLoadStates
 ) => {
-  // Method 1: If aspect ratio is provided directly
-  if (project.aspectRatio) {
-    return Math.floor(thumbnailHeight * project.aspectRatio);
+
+  const projectType = project._modelApiKey;
+  const fileType = projectType === "photo" ? "photo" : "thumbnail";
+
+  if (project[fileType].width && project[fileType].height) {
+    return Math.floor((project[fileType].width / project[fileType].height) * thumbnailHeight);
   }
 
-  // Method 2: If width and height are provided
-  if (project.width && project.height) {
-    return Math.floor((project.width / project.height) * thumbnailHeight);
-  }
-
-  // Method 3: If image dimensions are loaded from imageLoadStates
-  const loadState = imageLoadStates[project.id || index];
-  if (loadState && loadState.naturalWidth && loadState.naturalHeight) {
-    return Math.floor(
-      (loadState.naturalWidth / loadState.naturalHeight) * thumbnailHeight
-    );
-  }
-
-  // Fallback: square thumbnail while loading
   return thumbnailHeight;
 };
 

@@ -7,34 +7,34 @@ export const usePreloader = async (assets, onProgress) => {
   const loadImage = (asset) => {
     return new Promise((resolve) => {
 
-      if (asset.format === "jpg" || asset.format === "png") {
-        const img = new Image()
-        img.onload = img.onerror = () => {
-          loaded++
-          onProgress(loaded.toString().padStart(2, "0"));
-          resolve()
-        }
-        img.src = asset.url
-      }
+       if (asset._modelApiKey === "photo") {
+         const img = new Image();
+         img.onload = img.onerror = () => {
+           loaded++;
+           onProgress(loaded.toString().padStart(2, "0"));
+           resolve();
+         };
+         img.src = asset.photo.url;
+       }
 
-      if (!isMobile() && asset.format === "mp4") {
-        const video = document.createElement("video")
-        video.src = asset.url
-        video.addEventListener("loadeddata", () => {
-          loaded++
-          onProgress(loaded.toString().padStart(2, "0"));
-          resolve()
-        })
-      }
+       if (!isMobile() && asset._modelApiKey === "video") {
+         const video = document.createElement("video");
+         video.src = asset.video.url;
+         video.addEventListener("loadeddata", () => {
+           loaded++;
+           onProgress(loaded.toString().padStart(2, "0"));
+           resolve();
+         });
+       }
 
-      if (isMobile() && asset.format === "mp4") {
+      if (isMobile() && asset._modelApiKey === "video") {
         const img = new Image();
         img.onload = img.onerror = () => {
           loaded++;
           onProgress(loaded.toString().padStart(2, "0"));
           resolve();
         };
-        img.src = asset.video.thumbnailUrl;
+        img.src = asset.thumbnail.src;
       }
     })
   }

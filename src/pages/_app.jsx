@@ -14,23 +14,23 @@ import Nav from "@/components/Nav";
 export default function App({ Component, pageProps, router }) {
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState("00");
-  const [total, setTotal] = useState("20");
+  const [total, setTotal] = useState("00");
 
   const { data } = useSWR(getHome, (query) => fetcher(query));
 
-  const images = data?.home?.assets;
+  const assets = data?.home?.assets;
 
   // Preload images when available
   useEffect(() => {
-    if (!images) return;
+    if (!assets) return;
 
-    setTotal(images.length);
-    usePreloader(images, setProgress).then(() => {
+    setTotal(assets.length.toString().padStart(2, "0"));
+    usePreloader(assets, setProgress).then(() => {
       setTimeout(() => {
         setLoading(false); // Hide immediately when done
       }, 500);
     });
-  }, [images]);
+  }, [assets]);
 
   return (
     <>

@@ -709,8 +709,8 @@ export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
             variants={pageAnimation}
             style={{
               gap: `${dynamicGap}px`,
-              // transition:
-              //   isTouchDevice || isSafari ? "none" : "transform 0.3s ease-out",
+              transition:
+                isTouchDevice || isSafari ? "none" : "transform 0.3s ease-out",
               transform: `translate3d(${scrollOffset}px, 0, 0)`,
             }}
             className={`work__container${isDragging ? " dragging" : ""}`}
@@ -736,23 +736,23 @@ export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
               style={{ transform: `translateX(${-scrollOffset}px)` }}
             />
             {home.assets.map((asset, index) => {
-              if (asset.format === "jpg") {
+              if (asset._modelApiKey === "photo") {
                 return (
                   <motion.div
                     variants={thumbnailAnimation}
                     className={`item${
                       index === activeThumbnail ? " active" : ""
                     }`}
-                    key={asset.id}
+                    key={asset.photo.id}
                     ref={(el) => (thumbnailRefs.current[index] = el)}
                     onClick={() => handleThumbnailClick(index)}
                   >
-                    <img src={asset.url} alt={asset.alt} draggable="false" />
+                    <img src={asset.photo.url} alt={asset.photo.alt} draggable="false" />
                   </motion.div>
                 );
               }
 
-              if (asset.format === "mp4") {
+              if (asset._modelApiKey === "video") {
                 return (
                   <motion.div
                     variants={thumbnailAnimation}
@@ -763,7 +763,7 @@ export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
                     ref={(el) => (thumbnailRefs.current[index] = el)}
                     onClick={() => handleThumbnailClick(index)}
                   >
-                    <img src={asset.video.thumbnailUrl} alt={asset.alt} draggable="false" />
+                    <img src={asset.thumbnail.url} alt={asset.thumbnail.alt} draggable="false" />
                   </motion.div>
                 );
               }
