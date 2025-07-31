@@ -272,7 +272,7 @@ export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
         const stopThreshold = isTouchDevice ? 0.05 : 0.1;
         if (Math.abs(momentumRef.current) < stopThreshold) {
           momentumRef.current = 0;
-          setTimeout(snapToPosition, isTouchDevice ? 100 : 200);
+          // setTimeout(snapToPosition, isTouchDevice ? 100 : 200);
         }
       }
 
@@ -306,7 +306,7 @@ export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
         // Safari Desktop: Ultra-simple direct scrolling
         const scrollDelta = e.deltaY + e.deltaX;
         const newOffset = clampOffset(
-          currentScrollOffsetRef.current - scrollDelta * 0.7,
+          currentScrollOffsetRef.current - scrollDelta,
           minOffset,
           maxOffset
         );
@@ -325,7 +325,7 @@ export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
         if (snapTimeoutRef.current) {
           clearTimeout(snapTimeoutRef.current);
         }
-        snapTimeoutRef.current = setTimeout(snapToPosition, 150);
+        // snapTimeoutRef.current = setTimeout(snapToPosition, 150);
       } else {
         // Other browsers: Use RAF
         let ticking = false;
@@ -335,7 +335,7 @@ export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
             momentumRef.current = 0;
 
             const newOffset = clampOffset(
-              currentScrollOffsetRef.current - scrollDelta * 0.7,
+              currentScrollOffsetRef.current - scrollDelta,
               minOffset,
               maxOffset
             );
@@ -347,7 +347,7 @@ export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
             if (snapTimeoutRef.current) {
               clearTimeout(snapTimeoutRef.current);
             }
-            snapTimeoutRef.current = setTimeout(snapToPosition, 200);
+            // snapTimeoutRef.current = setTimeout(snapToPosition, 200);
 
             ticking = false;
           });
@@ -445,7 +445,7 @@ export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
 
       if (isSafariDesktop) {
         // Safari Desktop: Skip momentum, just snap
-        setTimeout(snapToPosition, 100);
+        // setTimeout(snapToPosition, 100);
       } else {
         // Mobile (all browsers) and non-Safari desktop: Calculate momentum
         let finalVelocity = 0;
@@ -466,10 +466,10 @@ export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
             momentumRef.current = finalVelocity;
             startAnimationLoop();
           } else {
-            setTimeout(snapToPosition, 150);
+            // setTimeout(snapToPosition, 150);
           }
         } else {
-          setTimeout(snapToPosition, 150);
+          // setTimeout(snapToPosition, 150);
         }
       }
 

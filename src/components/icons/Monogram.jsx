@@ -10,14 +10,10 @@ export default function Monogram(fill) {
     initial: {
       opacity: 0,
       fillOpacity: 0,
-      fill: "rgba(0, 0, 0, 0)",
-      filter: "drop-shadow(0 0 10rem rgba(252, 251, 248, 1))",
     },
     enter: {
       opacity: 1,
       fillOpacity: 1,
-      fill: "var(--text-color)",
-      filter: "drop-shadow(0 0 10rem rgba(252, 251, 248, 0))",
       transition: {
         type: "tween",
         duration: 0.5,
@@ -25,8 +21,8 @@ export default function Monogram(fill) {
       },
     },
     exit: {
-      opacity: 0,
-      x: 0,
+      opacity: 1,
+
     },
   };
 
