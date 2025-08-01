@@ -637,14 +637,14 @@ export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
   const featuredImage = {
     initial: {
       opacity: 0,
-      clipPath: "inset(0 100% 0 0)"
+      clipPath: "inset(0 100% 0 0)",
     },
     enter: {
       opacity: 1,
       clipPath: "inset(0 0 0 0)",
       transition: {
         type: "tween",
-        duration: 0.75,
+        duration: 0.5,
         ease: [0, 0.55, 0.45, 1],
       },
     },
@@ -658,20 +658,20 @@ export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
     initial: {
       transition: {
         staggerChildren: (0.025, { from: "last" }),
-        ease: [0.12, 0, 0.39, 0],
+        ease: [0, 0.55, 0.45, 1],
       },
     },
     enter: {
       transition: {
         staggerChildren: 0.025,
-        ease: [0.12, 0, 0.39, 0],
+        ease: [0, 0.55, 0.45, 1],
       },
     },
     exit: {
       transition: {
         duration: 0.5,
         staggerChildren: 0.025,
-        ease: [0.12, 0, 0.39, 0],
+        ease: [0, 0.55, 0.45, 1],
       },
     },
   };
@@ -716,20 +716,18 @@ export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
             className={`work__container${isDragging ? " dragging" : ""}`}
             ref={thumbnailGridRef}
           >
-            <motion.div
+            <div
               className="featured"
               ref={featuredRef}
               style={{
                 transform: `translate3d(${-scrollOffset}px, 0, 0)`,
-                transition:
-                  isTouchDevice
-                    ? "none"
-                    : "transform 0.3s ease-out",
+                transition: isTouchDevice ? "none" : "transform 0.3s ease-out",
               }}
-              {...anim(featuredImage)}
             >
-              <FeaturedAsset asset={home.assets[activeThumbnail]} />
-            </motion.div>
+              <motion.div {...anim(featuredImage)} className="featured__inner">
+                <FeaturedAsset asset={home.assets[activeThumbnail]} />
+              </motion.div>
+            </div>
             <div
               className="cursor"
               ref={cursorRef}
@@ -747,7 +745,11 @@ export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
                     ref={(el) => (thumbnailRefs.current[index] = el)}
                     onClick={() => handleThumbnailClick(index)}
                   >
-                    <img src={asset.photo.url} alt={asset.photo.alt} draggable="false" />
+                    <img
+                      src={asset.photo.url}
+                      alt={asset.photo.alt}
+                      draggable="false"
+                    />
                   </motion.div>
                 );
               }
@@ -763,7 +765,11 @@ export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
                     ref={(el) => (thumbnailRefs.current[index] = el)}
                     onClick={() => handleThumbnailClick(index)}
                   >
-                    <img src={asset.thumbnail.url} alt={asset.thumbnail.alt} draggable="false" />
+                    <img
+                      src={asset.thumbnail.url}
+                      alt={asset.thumbnail.alt}
+                      draggable="false"
+                    />
                   </motion.div>
                 );
               }
