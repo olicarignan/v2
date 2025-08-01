@@ -8,7 +8,6 @@ import Montreal from "@/components/icons/Montreal";
 import Layout from "@/layouts/Layout";
 import { anim } from "@/utils/animate";
 import { useMobile } from "@/hooks/useMobile";
-import { SplitText } from "@/components/SplitText";
 
 export default function Info({ info }) {
   const { clients, services } = info;
@@ -131,19 +130,13 @@ export default function Info({ info }) {
   return (
     <Layout>
       <main className="info">
-        <div className="info__wrapper">
+        <div className="info__wrapper" style={{ alignItems: isMobile ? "flex-start" : "center" }}>
           <motion.div
             className="hero"
             variants={hero}
             animate="visible"
             initial="hidden"
           >
-            {/* <SplitText>
-              Olivier Carignan is conducting an independent design-led development and
-              multidisciplinary design practice. I partner with studios, brands and individuals
-              worldwide to build thoughtful,expressive digital experiences at the
-              intersection of design, technology, and culture.
-            </SplitText> */}
             {heroText.map((text, index) => (
               <div
                 className="wrapper"

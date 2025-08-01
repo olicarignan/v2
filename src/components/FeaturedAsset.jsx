@@ -1,5 +1,4 @@
 export const FeaturedAsset = ({ asset }) => {
-  console.log(asset)
 
   if (asset._modelApiKey === "photo") {
     return <img src={asset.photo.url} alt={asset.photo.alt} />;
