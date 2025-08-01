@@ -571,7 +571,7 @@ export default function Home({ home, thumbnailHeightVh = 12, projects = [] }) {
             style={{
               gap: `${dynamicGap}px`,
               transition:
-                isTouchDevice || isSafari ? "none" : "transform 0.3s ease-out",
+                isTouchDevice  ? "none" : "transform 0.3s ease-out",
               transform: `translate3d(${scrollOffset}px, 0, 0)`,
             }}
             className={`work__container${isDragging ? " dragging" : ""}`}
