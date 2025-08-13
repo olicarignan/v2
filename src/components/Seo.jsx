@@ -25,11 +25,6 @@ export default function Seo() {
           rel="icon"
           type="image/png"
           href="/images/favicon_light.png"
-        />
-        <link
-          rel="icon"
-          type="image/png"
-          href="/images/favicon_light.png"
           media="(prefers-color-scheme: light)"
         />
         <link
@@ -38,6 +33,7 @@ export default function Seo() {
           href="/images/favicon_dark.png"
           media="(prefers-color-scheme: dark)"
         />
+        <link rel="icon" href="/images/favicon.ico" />
         <link
           rel="mask-icon"
           href="/images/apple_touch--light.png"
