@@ -25,6 +25,11 @@ export default function Seo() {
           rel="icon"
           type="image/png"
           href="/images/favicon_light.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          href="/images/favicon_light.png"
           media="(prefers-color-scheme: light)"
         />
         <link
