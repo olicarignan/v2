@@ -88,7 +88,6 @@ export default function Layout({ children}) {
 
   return (
     <div className="layout">
-      {/* <Nav /> */}
       <motion.div className="slide--loader" />
       <motion.div {...anim( router.pathname === "/" ? slideInfo : slideHome)} className="slide" />
       <motion.div {...anim( router.pathname === "/" ? perspectiveInfo : perspectiveHome)} className="perspective">

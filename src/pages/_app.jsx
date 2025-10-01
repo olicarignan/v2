@@ -7,8 +7,6 @@ import useSWR from "swr";
 import { fetcher } from "@/utils/propData";
 import { getHome } from "@/gql/queries.js";
 import Seo from "@/components/Seo";
-import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 import Nav from "@/components/Nav";
 
 export default function App({ Component, pageProps, router }) {
@@ -43,8 +41,6 @@ export default function App({ Component, pageProps, router }) {
           <Component key={router.route} {...pageProps} home={data.home} />
         )}
       </AnimatePresence>
-      <Analytics />
-      <SpeedInsights />
     </>
   );
 }

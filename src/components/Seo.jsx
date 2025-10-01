@@ -82,6 +82,11 @@ export default function Seo() {
         />
         <meta name="twitter:image" content="/images/og-image--light.png" />
         {/* END TWITTER META */}
+        <script
+          defer
+          src="https://cloud.umami.is/script.js"
+          data-website-id="a2ba20c1-3fc9-466c-959b-7bb37011f8ab"
+        ></script>
       </Head>
     </>
   );
