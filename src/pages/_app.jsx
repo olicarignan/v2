@@ -8,6 +8,7 @@ import { fetcher } from "@/utils/propData";
 import { getHome } from "@/gql/queries.js";
 import Seo from "@/components/Seo";
 import Nav from "@/components/Nav";
+import PlausibleProvider from "next-plausible";
 
 export default function App({ Component, pageProps, router }) {
   const [loading, setLoading] = useState(true);
@@ -31,7 +32,7 @@ export default function App({ Component, pageProps, router }) {
   }, [assets]);
 
   return (
-    <>
+    <PlausibleProvider domain="oliviercarignan.com" trackOutboundLinks={true} >
       <Seo />
       {!loading && <Nav />}
       <AnimatePresence mode="wait" initial="false">
@@ -41,6 +42,6 @@ export default function App({ Component, pageProps, router }) {
           <Component key={router.route} {...pageProps} home={data.home} />
         )}
       </AnimatePresence>
-    </>
+    </PlausibleProvider>
   );
 }

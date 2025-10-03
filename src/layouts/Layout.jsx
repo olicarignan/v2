@@ -3,7 +3,6 @@
 import { motion } from "motion/react";
 import { useRouter } from "next/router";
 
-import Nav from "@/components/Nav";
 import { anim } from "@/utils/animate";
 
 export default function Layout({ children}) {

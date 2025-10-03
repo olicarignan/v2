@@ -87,6 +87,11 @@ export default function Seo() {
           src="https://cloud.umami.is/script.js"
           data-website-id="a2ba20c1-3fc9-466c-959b-7bb37011f8ab"
         ></script>
+        <script
+          defer
+          data-domain="oliviercarignan.com"
+          src="https://plausible.brunch.work/js/script.js"
+        ></script>
       </Head>
     </>
   );
