@@ -128,7 +128,7 @@ export default function Home({ data }) {
           <h3>Selected Clients</h3>
           <p>
             Apple, WØRKS Studio, Evenko, RTINGS.com, REF Digital, ARC Health,
-            LG2, Rounder
+            LG2, Webisoft
           </p>
         </motion.div>
 
